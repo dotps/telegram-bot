@@ -1,51 +1,37 @@
 import {Commands} from "./Commands/Commands"
 import {IInputOutputService} from "./Services/IInputOutputService"
 import {StartCommand} from "./Commands/StartCommand"
+import {ICommandFactory} from "./Factory/ICommandFactory"
+import {ResponseData} from "./Data/ResponseData"
+import {IModel} from "./Model/IModel"
 
 export class Controller {
     private readonly inputOutputService: IInputOutputService
+    private commandFactory: ICommandFactory
+    private model: IModel
+    private defaultResponseData: ResponseData = {data: [`Неизвестная команда.`]}
 
-    constructor(inputOutputService: IInputOutputService) {
+    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory) {
+        this.model = model
+        this.commandFactory = commandFactory
         this.inputOutputService = inputOutputService
     }
 
     async run() {
 
-        let isRunning = true
+        while (this.model.isAppRunning()) {
 
-        while (isRunning) {
-
-            let input  = await this.inputOutputService.getQuery("> ")
+            let input  = await this.inputOutputService.getQuery()
             input = input.toLowerCase()
 
             let responseData = {}
 
-            switch (input) {
-                case Commands.EXIT:
-                    this.inputOutputService.close()
-                    isRunning = false
-                    break
-                case Commands.START:
-                    const command = new StartCommand()
-                    responseData = command.execute()
-                    break
-                case Commands.CURRENCY:
-                    responseData = {
-                        data: [
-                            `Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена.`
-                        ]
-                    }
-                    break
-                default:
-                    responseData = {
-                        data: "Неизвестная комманда."
-                    }
-            }
+            const command = this.commandFactory.createCommand(input)
+            responseData = command ? command.execute() : this.defaultResponseData
 
-            if (responseData) {
-                this.inputOutputService.sendResponse(responseData)
-            }
-
+            this.inputOutputService.sendResponse(responseData)
         }
+
+        this.inputOutputService.close()
     }
 }

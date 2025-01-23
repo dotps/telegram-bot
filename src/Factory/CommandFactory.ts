@@ -1,23 +1,26 @@
 import {ICommand} from "../Commands/ICommand"
 import {Commands} from "../Commands/Commands"
 import {StartCommand} from "../Commands/StartCommand"
+import {ExitCommand} from "../Commands/ExitCommand"
+import {ICommandFactory} from "./ICommandFactory"
+import {IModel} from "../Model/IModel"
+import {CurrencyCommand} from "../Commands/CurrencyCommand"
 
-export class CommandFactory {
+export class CommandFactory implements ICommandFactory {
+    private readonly model: IModel
 
-    // TODO: продолжить делать фабрику
+    constructor(model: IModel) {
+        this.model = model
+    }
 
     createCommand(command: string): ICommand | null {
         switch (command) {
-            // case Commands.EXIT:
-            //     this.inputOutputService.close()
-            //     isRunning = false
-            //     break
+            case Commands.EXIT:
+                return new ExitCommand(this.model)
             case Commands.START:
-                const command = new StartCommand()
-                // responseData = command.execute()
-                break
-            // case Commands.CURRENCY:
-            //     break
+                return new StartCommand()
+            case Commands.CURRENCY:
+                return new CurrencyCommand()
             default:
                 return null
         }

@@ -12,8 +12,6 @@ export class StartCommand implements ICommand {
     }
 
     execute(): ResponseData {
-
-
         return this.responseData
     }
 

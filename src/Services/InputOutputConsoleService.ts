@@ -5,6 +5,7 @@ import {ResponseData} from "../Data/ResponseData"
 export class InputOutputConsoleService implements IInputOutputService {
 
     ioService: Interface
+    beforeCursorText: string = "> "
 
     constructor() {
         this.ioService = createInterface({
@@ -13,8 +14,8 @@ export class InputOutputConsoleService implements IInputOutputService {
         })
     }
 
-    async getQuery(text: string): Promise<string> {
-        return await this.ioService.question(text)
+    async getQuery(): Promise<string> {
+        return await this.ioService.question(this.beforeCursorText)
     }
 
     close(): void {
@@ -24,6 +25,10 @@ export class InputOutputConsoleService implements IInputOutputService {
     sendResponse(response: ResponseData): void {
         if (!response)
             return
-        console.log(response)
+
+        const data = response?.data || []
+        for (const text of data) {
+            console.log(text)
+        }
     }
 }
