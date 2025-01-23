@@ -1,17 +1,18 @@
-import {Commands} from "./Commands/Commands"
 import {IInputOutputService} from "./Services/IInputOutputService"
-import {StartCommand} from "./Commands/StartCommand"
 import {ICommandFactory} from "./Factory/ICommandFactory"
 import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
+import {CurrencyService} from "./Services/Currency/CurrencyService"
 
 export class Controller {
     private readonly inputOutputService: IInputOutputService
     private commandFactory: ICommandFactory
+    private currencyService: CurrencyService
     private model: IModel
     private defaultResponseData: ResponseData = {data: [`Неизвестная команда.`]}
 
-    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory) {
+    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: CurrencyService) {
+        this.currencyService = currencyService
         this.model = model
         this.commandFactory = commandFactory
         this.inputOutputService = inputOutputService
@@ -22,7 +23,13 @@ export class Controller {
         while (this.model.isAppRunning()) {
 
             let input  = await this.inputOutputService.getQuery()
-            input = input.toLowerCase()
+            input = input.toLowerCase().trim()
+
+            const currencies = this.currencyService.parseCurrencyCodes(input)
+            console.log(currencies)
+            if (currencies) {
+                this.model.setCurrencies(currencies)
+            }
 
             let responseData = {}
 
@@ -34,4 +41,6 @@ export class Controller {
 
         this.inputOutputService.close()
     }
+
+
 }

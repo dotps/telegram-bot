@@ -9,6 +9,9 @@ export class CurrencyCommand implements ICommand {
         ]
     }
 
+    constructor() {
+    }
+
     execute(): ResponseData {
         return this.responseData
     }
