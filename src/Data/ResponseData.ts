@@ -1,3 +1,3 @@
 export type ResponseData = {
-    data?: string
+    data?: string[]
 }

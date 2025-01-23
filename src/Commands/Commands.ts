@@ -1,3 +1,5 @@
 export enum Commands {
-    EXIT = "exit"
+    EXIT = "exit",
+    CURRENCY = "currency",
+    START = "start",
 }
