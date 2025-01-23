@@ -8,6 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/node": "^22.10.9",
     "typescript": "^5.5.3"
   },
   "private": true
