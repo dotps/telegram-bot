@@ -5,27 +5,26 @@ import {ExitCommand} from "../Commands/ExitCommand"
 import {ICommandFactory} from "./ICommandFactory"
 import {IModel} from "../Model/IModel"
 import {CurrencyCommand} from "../Commands/CurrencyCommand"
-import {CurrencyService} from "../Services/Currency/CurrencyService"
 import {CurrencyRatioCommand} from "../Commands/CurrencyRatioCommand"
+import {ICurrencyService} from "../Services/Currency/ICurrencyService"
 
 export class CommandFactory implements ICommandFactory {
     private readonly model: IModel
-    private currencyService: CurrencyService
+    private readonly currencyService: ICurrencyService
 
-    constructor(model: IModel, currencyService: CurrencyService) {
+    constructor(model: IModel, currencyService: ICurrencyService) {
         this.currencyService = currencyService
         this.model = model
     }
 
     createCommand(command: string): ICommand | null {
-        console.log(command)
         switch (command) {
             case Commands.EXIT:
                 return new ExitCommand(this.model)
             case Commands.START:
                 return new StartCommand()
             case Commands.CURRENCY:
-                return new CurrencyCommand()
+                return new CurrencyCommand(this.currencyService)
             case Commands.CURRENCY_RATIO:
                 return new CurrencyRatioCommand(this.currencyService)
             default:

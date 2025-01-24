@@ -1,5 +1,6 @@
 import {ICommand} from "./ICommand"
 import {ResponseData} from "../Data/ResponseData"
+import {ICurrencyService} from "../Services/Currency/ICurrencyService"
 
 export class CurrencyCommand implements ICommand {
 
@@ -8,12 +9,14 @@ export class CurrencyCommand implements ICommand {
             `Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена.`
         ]
     }
+    private currencyService: ICurrencyService
 
-    constructor() {
+    constructor(currencyService: ICurrencyService) {
+        this.currencyService = currencyService
     }
 
-    async execute(currencies?: string[] | null): Promise<ResponseData | null> {
-        console.log(currencies)
+    async execute(): Promise<ResponseData | null> {
+        const currencies = await this.currencyService.getCurrencyList()
         return this.responseData
     }
 

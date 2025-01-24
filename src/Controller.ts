@@ -2,19 +2,18 @@ import {IInputOutputService} from "./Services/IInputOutputService"
 import {ICommandFactory} from "./Factory/ICommandFactory"
 import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
-import {CurrencyService} from "./Services/Currency/CurrencyService"
 import {Commands} from "./Commands/Commands"
-import {debug} from "node:util"
+import {ICurrencyService} from "./Services/Currency/ICurrencyService"
 
 export class Controller {
 
     private readonly inputOutputService: IInputOutputService
     private commandFactory: ICommandFactory
-    private currencyService: CurrencyService
+    private currencyService: ICurrencyService
     private model: IModel
     private defaultResponseData: ResponseData = {data: [`Неизвестная команда.`]}
 
-    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: CurrencyService) {
+    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService) {
         this.currencyService = currencyService
         this.model = model
         this.commandFactory = commandFactory

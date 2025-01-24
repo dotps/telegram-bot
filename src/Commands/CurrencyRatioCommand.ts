@@ -5,6 +5,9 @@ import {ICurrencyService} from "../Services/Currency/ICurrencyService"
 export class CurrencyRatioCommand implements ICommand {
 
     private currencyService: ICurrencyService
+    private errorResponse = {
+        data: ["Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."]
+    }
 
     constructor(currencyService: ICurrencyService) {
         this.currencyService = currencyService
@@ -13,6 +16,9 @@ export class CurrencyRatioCommand implements ICommand {
     async execute(currencies:string[] = []): Promise<ResponseData | null> {
 
         const rates = await this.currencyService.getCurrencyRatio(currencies)
+
+        // TODO: тут продолжить, протестировать
+
         if (rates) {
             return {
                 data: [
@@ -20,9 +26,8 @@ export class CurrencyRatioCommand implements ICommand {
                 ]
             }
         }
-        console.log(rates)
 
-        return null
+        return this.errorResponse
     }
 
 }
