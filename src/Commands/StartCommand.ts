@@ -11,7 +11,7 @@ export class StartCommand implements ICommand {
         ]
     }
 
-    execute(): ResponseData {
+    async execute(): Promise<ResponseData | null> {
         return this.responseData
     }
 

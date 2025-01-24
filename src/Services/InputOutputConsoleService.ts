@@ -16,8 +16,9 @@ export class InputOutputConsoleService implements IInputOutputService {
     }
 
     async getQuery(): Promise<QueryData> {
+        const text = await this.ioService.question(this.beforeCursorText)
         return {
-            text: await this.ioService.question(this.beforeCursorText)
+            text: text
         }
     }
 

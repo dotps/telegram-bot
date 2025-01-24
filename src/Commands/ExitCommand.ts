@@ -15,7 +15,7 @@ export class ExitCommand implements ICommand {
         this.model = model
     }
 
-    execute(): ResponseData {
+    async execute(): Promise<ResponseData | null> {
         this.model.stopApp()
         return this.responseData
     }

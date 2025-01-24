@@ -2,21 +2,28 @@ import {ICurrencyService} from "./ICurrencyService"
 import {ICurrencyProvider} from "./ICurrencyProvider"
 
 export class CurrencyService implements ICurrencyService {
-    private provider: ICurrencyProvider
+    private currencyProvider: ICurrencyProvider
+    private errorMessage = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
 
-    constructor(provider: ICurrencyProvider) {
-        this.provider = provider
+    constructor(currencyProvider: ICurrencyProvider) {
+        this.currencyProvider = currencyProvider
     }
 
-    getRates(currencies: string[]) {
-        // TODO: реализовать поставщика валют
-        this.provider.getRates(currencies)
+    async getCurrencyRatio(currencies: string[]) {
+        const rates = await this.currencyProvider.getCurrencyRatio(currencies)
+        if (rates) {
+            console.log(rates)
+            return rates
+        }
+        else {
+            console.log(this.errorMessage)
+            return null
+        }
     }
 
     parseCurrencyCodes(input: string): string[] | null {
         const pattern = /^[A-Za-z]{3}-[A-Za-z]{3}$/;
-        if (!pattern.test(input)) return null
-        return input.toUpperCase().split('-')
+        return pattern.test(input) ? input.toUpperCase().split('-') : null
     }
 }
 

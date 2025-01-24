@@ -1,4 +1,5 @@
-export interface ICurrencyProvider {
+import {CurrencyRatio} from "./CurrencyProviderExchangeRatesApi"
 
-    getRates(currencies: string[]): void
+export interface ICurrencyProvider {
+    getCurrencyRatio(currencies: string[]): Promise<CurrencyRatio | null>
 }
