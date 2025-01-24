@@ -1,5 +1,6 @@
 import {ICurrencyProvider} from "./ICurrencyProvider"
 import {IWebRequestService} from "../IWebRequestService"
+import {CurrencyRatio} from "./CurrencyRatio"
 
 export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
 
@@ -38,8 +39,3 @@ export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
     }
 }
 
-export type CurrencyRatio = {
-    firstCurrency: string,
-    secondCurrency: string,
-    ratio: number,
-}
