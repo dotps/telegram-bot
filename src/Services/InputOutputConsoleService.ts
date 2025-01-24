@@ -1,6 +1,7 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {createInterface, Interface} from "node:readline/promises"
 import {ResponseData} from "../Data/ResponseData"
+import {QueryData} from "../Data/QueryData"
 
 export class InputOutputConsoleService implements IInputOutputService {
 
@@ -14,8 +15,10 @@ export class InputOutputConsoleService implements IInputOutputService {
         })
     }
 
-    async getQuery(): Promise<string> {
-        return await this.ioService.question(this.beforeCursorText)
+    async getQuery(): Promise<QueryData> {
+        return {
+            text: await this.ioService.question(this.beforeCursorText)
+        }
     }
 
     close(): void {

@@ -11,8 +11,4 @@ export class Model implements  IModel {
     stopApp(): void {
         this.isRunning = false
     }
-
-    setCurrencies(currencies: string[]): void {
-        // TODO: продолжить здесь
-    }
 }

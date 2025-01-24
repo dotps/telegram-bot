@@ -12,7 +12,8 @@ export class CurrencyCommand implements ICommand {
     constructor() {
     }
 
-    execute(): ResponseData {
+    execute(currencies?: string[] | null): ResponseData {
+        console.log(currencies)
         return this.responseData
     }
 

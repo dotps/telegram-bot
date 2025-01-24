@@ -3,6 +3,7 @@ import {ICommandFactory} from "./Factory/ICommandFactory"
 import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
 import {CurrencyService} from "./Services/Currency/CurrencyService"
+import {Commands} from "./Commands/Commands"
 
 export class Controller {
     private readonly inputOutputService: IInputOutputService
@@ -21,20 +22,17 @@ export class Controller {
     async run() {
 
         while (this.model.isAppRunning()) {
-
-            let input  = await this.inputOutputService.getQuery()
-            input = input.toLowerCase().trim()
+            let responseData = {}
+            const queryData  = await this.inputOutputService.getQuery()
+            let input = queryData.text.toLowerCase().trim()
 
             const currencies = this.currencyService.parseCurrencyCodes(input)
-            console.log(currencies)
             if (currencies) {
-                this.model.setCurrencies(currencies)
+                input = Commands.CURRENCY_PAIR
             }
 
-            let responseData = {}
-
             const command = this.commandFactory.createCommand(input)
-            responseData = command ? command.execute() : this.defaultResponseData
+            responseData = command ? command.execute(currencies) : this.defaultResponseData
 
             this.inputOutputService.sendResponse(responseData)
         }
