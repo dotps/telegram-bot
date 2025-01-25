@@ -18,7 +18,7 @@ Logger.init(new ConsoleLogger(true))
 const inputOutputService: IInputOutputService = new InputOutputConsoleService()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
 const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi(webRequestService)
-const currencyService: ICurrencyService = new CurrencyService(currencyProvider, inputOutputService)
+const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 const app = new Controller(model, inputOutputService, commandFactory, currencyService)
 

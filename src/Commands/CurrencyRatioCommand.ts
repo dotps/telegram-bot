@@ -15,14 +15,12 @@ export class CurrencyRatioCommand implements ICommand {
 
     async execute(currencies:string[] = []): Promise<ResponseData | null> {
 
-        const rates = await this.currencyService.getCurrencyRatio(currencies)
+        const currencyRatio = await this.currencyService.getCurrencyRatio(currencies)
 
-        // TODO: тут продолжить, протестировать
-
-        if (rates) {
+        if (currencyRatio) {
             return {
                 data: [
-                    `Текущий курс ${rates.firstCurrency} к ${rates.secondCurrency}: ${rates.ratio}.`
+                    `Текущий курс ${currencyRatio.firstCurrency} к ${currencyRatio.secondCurrency}: ${currencyRatio.ratio}.`
                 ]
             }
         }

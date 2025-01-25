@@ -5,26 +5,13 @@ import {IInputOutputService} from "../IInputOutputService"
 export class CurrencyService implements ICurrencyService {
 
     private currencyProvider: ICurrencyProvider
-    private inputOutputService: IInputOutputService
 
-    constructor(currencyProvider: ICurrencyProvider, inputOutputService: IInputOutputService) {
-        this.inputOutputService = inputOutputService
+    constructor(currencyProvider: ICurrencyProvider) {
         this.currencyProvider = currencyProvider
     }
 
     async getCurrencyRatio(currencies: string[]) {
-        const rates = await this.currencyProvider.getCurrencyRatio(currencies)
-        if (rates) {
-            return rates
-        }
-        else {
-            // const errorResponse = {
-            //     data: ["Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."]
-            // }
-            // // TODO: так не правильно,
-            // this.inputOutputService.sendResponse(errorResponse)
-            return null
-        }
+        return await this.currencyProvider.getCurrencyRatio(currencies)
     }
 
     async getCurrencyList(): Promise<string[] | null> {
