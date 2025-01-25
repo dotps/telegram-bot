@@ -16,7 +16,14 @@ export class CurrencyCommand implements ICommand {
     }
 
     async execute(): Promise<ResponseData | null> {
-        const currencies = await this.currencyService.getCurrencyList()
+        const symbols = await this.currencyService.getCurrencySymbols()
+        if (!symbols) {
+            this.responseData.data = ["Ой! Что-то пошло не так."]
+            return this.responseData
+        }
+
+        this.responseData.data?.unshift(symbols.join(", "))
+        this.responseData.data?.unshift("Доступные валюты:")
         return this.responseData
     }
 

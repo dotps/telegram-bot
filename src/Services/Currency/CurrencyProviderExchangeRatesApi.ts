@@ -4,8 +4,9 @@ import {CurrencyRatio} from "./CurrencyRatio"
 
 export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
 
-    private readonly baseUrl: string = "https://api.exchangeratesapi.io/v1/latest"
+    private readonly apiUrl: string = "https://api.exchangeratesapi.io/v1/latest"
     private readonly apiKey:string = "e4bc5f02eb4d7bd6ade74a71ade2089c"
+    private readonly baseUrl: string = this.apiUrl + "?access_key=" + this.apiKey
     private readonly webRequestService: IWebRequestService
 
     constructor(webRequestService: IWebRequestService) {
@@ -13,11 +14,8 @@ export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
     }
 
     async getCurrencyRatio(currencies: string[]): Promise<CurrencyRatio | null> {
-
-        const url = this.baseUrl + "?access_key=" + this.apiKey
-        const response = await this.webRequestService.tryGet(url)
-
-        if (this.isNotValidRatioResponse(response)) return null
+        const response = await this.webRequestService.tryGet(this.baseUrl)
+        if (this.isNotValidResponse(response)) return null
 
         const [firstCurrencyKey, secondCurrencyKey] = currencies
         const firstCurrencyValue = Number(response.rates[firstCurrencyKey])
@@ -34,7 +32,14 @@ export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
         }
     }
 
-    private isNotValidRatioResponse(response: any) {
+    async getCurrencySymbols(): Promise<string[] | null> {
+        const response = await this.webRequestService.tryGet(this.baseUrl)
+        if (this.isNotValidResponse(response)) return null
+
+        return Object.keys(response.rates)
+    }
+
+    private isNotValidResponse(response: any) {
         return !(response?.base && response?.rates)
     }
 }

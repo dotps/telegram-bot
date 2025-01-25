@@ -14,9 +14,8 @@ export class CurrencyService implements ICurrencyService {
         return await this.currencyProvider.getCurrencyRatio(currencies)
     }
 
-    async getCurrencyList(): Promise<string[] | null> {
-        // const currencyList = await this.currencyProvider.getCurrencyList()
-        return null
+    async getCurrencySymbols(): Promise<string[] | null> {
+        return await this.currencyProvider.getCurrencySymbols()
     }
 
     parseCurrencyCodes(input: string): string[] | null {
