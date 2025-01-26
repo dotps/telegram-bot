@@ -4,6 +4,8 @@ import {ICurrencyService} from "../Services/Currency/ICurrencyService"
 
 export class CurrencyCommand implements ICommand {
 
+    // TODO: ResponseData переделать в класс
+
     private responseData: ResponseData = {
         data: [
             `Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена.`
