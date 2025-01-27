@@ -10,12 +10,12 @@ export class WebRequestFetchService implements IWebRequestService {
             const response = await fetch(url)
             const responseData = await response.json()
 
-            Logger.log(`Response: ${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
-
             if (!response.ok) {
                 Logger.error(`${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
                 return null
             }
+
+            Logger.log(`Response: ${JSON.stringify(responseData)}`)
 
             return responseData
         }
