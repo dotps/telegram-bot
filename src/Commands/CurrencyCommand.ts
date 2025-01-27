@@ -4,29 +4,24 @@ import {ICurrencyService} from "../Services/Currency/ICurrencyService"
 
 export class CurrencyCommand implements ICommand {
 
-    // TODO: ResponseData переделать в класс
-
-    private responseData: ResponseData = {
-        data: [
-            `Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена.`
-        ]
-    }
     private currencyService: ICurrencyService
+    private responseError: string = "Ой! Что-то пошло не так."
+    private responseSuccess: string = "Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена."
+    private response: string[] = []
 
     constructor(currencyService: ICurrencyService) {
         this.currencyService = currencyService
     }
 
     async execute(): Promise<ResponseData | null> {
+
         const symbols = await this.currencyService.getCurrencySymbols()
-        if (!symbols) {
-            this.responseData.data = ["Ой! Что-то пошло не так."]
-            return this.responseData
-        }
+        if (!symbols) return new ResponseData([this.responseError])
 
-        this.responseData.data?.unshift(symbols.join(", "))
-        this.responseData.data?.unshift("Доступные валюты:")
-        return this.responseData
+        this.response.push("Доступные валюты:")
+        this.response.push(symbols.join(", "))
+        this.response.push(this.responseSuccess)
+
+        return new ResponseData(this.response)
     }
-
 }

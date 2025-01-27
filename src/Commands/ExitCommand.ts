@@ -5,11 +5,7 @@ import {IModel} from "../Model/IModel"
 export class ExitCommand implements ICommand {
 
     private model: IModel
-    private responseData: ResponseData = {
-        data: [
-            `Выход.`
-        ]
-    }
+    private response: string[] = ["Выход."]
 
     constructor(model: IModel) {
         this.model = model
@@ -17,6 +13,6 @@ export class ExitCommand implements ICommand {
 
     async execute(): Promise<ResponseData | null> {
         this.model.stopApp()
-        return this.responseData
+        return new ResponseData(this.response)
     }
 }
