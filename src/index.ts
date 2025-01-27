@@ -16,15 +16,16 @@ import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {TelegramApiProvider} from "./Services/Bots/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
 
+Logger.init(new ConsoleLogger(false))
+
 const model = new Model()
-Logger.init(new ConsoleLogger(true))
-const inputOutputService: IInputOutputService = new InputOutputConsoleService()
-// const inputOutputService: IInputOutputService = new InputOutputHTTPService()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
 const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
 const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
+const inputOutputService: IInputOutputService = new InputOutputConsoleService(model, currencyService, commandFactory)
+// const inputOutputService: IInputOutputService = new InputOutputHTTPService()
 const app = new Controller(model, inputOutputService, commandFactory, currencyService, botProvider)
 
 app.run()

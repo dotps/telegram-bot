@@ -30,6 +30,9 @@ export class Controller {
         await this.botProvider.init()
         console.log(this.botProvider.getBotId())
 
+        this.inputOutputService.start()
+
+        /*
         while (this.model.isAppRunning()) {
 
             let responseData: ResponseData | null = null
@@ -49,8 +52,9 @@ export class Controller {
 
             this.inputOutputService.sendResponse(responseData)
         }
+        */
 
-        this.inputOutputService.close()
+        // this.inputOutputService.close()
     }
 
 
