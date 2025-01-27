@@ -17,6 +17,9 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     private async handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+
+        // TODO: реализовать обработку запросов сервером
+
         if (request.method === 'GET' && request.url?.startsWith('/query')) {
             try {
                 // Парсим URL и извлекаем query-параметры
