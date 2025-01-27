@@ -24,8 +24,12 @@ const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestServi
 const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
-const inputOutputService: IInputOutputService = new InputOutputConsoleService(model, currencyService, commandFactory)
-// const inputOutputService: IInputOutputService = new InputOutputHTTPService()
+// const inputOutputService: IInputOutputService = new InputOutputConsoleService(model, currencyService, commandFactory)
+const inputOutputService: IInputOutputService = new InputOutputHTTPService(botProvider)
 const app = new Controller(model, inputOutputService, commandFactory, currencyService, botProvider)
 
 app.run()
+
+// (async () => {
+//     app.run()
+// })()

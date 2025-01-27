@@ -15,7 +15,6 @@ export class Controller {
     private botProvider: IBotProvider
     private currencyService: ICurrencyService
     private model: IModel
-    private defaultResponse: string = "Неизвестная команда."
 
     constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService, botProvider: IBotProvider) {
         this.botProvider = botProvider
@@ -27,34 +26,9 @@ export class Controller {
 
     async run() {
 
-        await this.botProvider.init()
-        console.log(this.botProvider.getBotId())
-
+        // await this.botProvider.init()
         this.inputOutputService.start()
 
-        /*
-        while (this.model.isAppRunning()) {
-
-            let responseData: ResponseData | null = null
-            const queryData  = await this.inputOutputService.getQuery()
-            let input = queryData.text.toLowerCase().trim()
-
-            const currencies = this.currencyService.parseCurrencyCodes(input)
-            if (currencies) {
-                input = Commands.CURRENCY_RATIO
-            }
-
-            const command = this.commandFactory.createCommand(input)
-
-            responseData = (command)
-                ? await command.execute(currencies)
-                : new ResponseData([this.defaultResponse])
-
-            this.inputOutputService.sendResponse(responseData)
-        }
-        */
-
-        // this.inputOutputService.close()
     }
 
 

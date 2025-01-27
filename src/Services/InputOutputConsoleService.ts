@@ -41,6 +41,8 @@ export class InputOutputConsoleService implements IInputOutputService {
             const queryData = await this.getQuery()
             let input = queryData.text.toLowerCase().trim()
 
+            // TODO: нужно логику вынести в общий метод для различных сервисов http/console, возможно даже пересмотреть ее
+            // не нравится постоянная отправка currencies в command.execute(currencies) когда не надо
             const currencies = this.currencyService.parseCurrencyCodes(input)
             if (currencies) {
                 input = Commands.CURRENCY_RATIO
