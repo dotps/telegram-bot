@@ -1,6 +1,5 @@
 import {ICurrencyService} from "./ICurrencyService"
 import {ICurrencyProvider} from "./ICurrencyProvider"
-import {IInputOutputService} from "../IInputOutputService"
 
 export class CurrencyService implements ICurrencyService {
 

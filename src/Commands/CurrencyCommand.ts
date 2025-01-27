@@ -1,6 +1,7 @@
 import {ICommand} from "./ICommand"
 import {ResponseData} from "../Data/ResponseData"
 import {ICurrencyService} from "../Services/Currency/ICurrencyService"
+import {Logger} from "../Utils/Logger"
 
 export class CurrencyCommand implements ICommand {
 
@@ -16,7 +17,10 @@ export class CurrencyCommand implements ICommand {
     async execute(): Promise<ResponseData | null> {
 
         const symbols = await this.currencyService.getCurrencySymbols()
-        if (!symbols) return new ResponseData([this.responseError])
+        if (!symbols) {
+            Logger.error(this.constructor.name + ", symbols is null" + this.responseError)
+            return new ResponseData([this.responseError])
+        }
 
         this.response.push("Доступные валюты:")
         this.response.push(symbols.join(", "))

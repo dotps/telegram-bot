@@ -3,6 +3,7 @@ import {ILoggerService} from "./ILoggerService";
 export class ConsoleLogger implements ILoggerService {
 
     private readonly enabled: boolean
+    private errorPrefix: string = "Error: "
 
     constructor(enabled: boolean = true) {
         this.enabled = enabled
@@ -13,11 +14,13 @@ export class ConsoleLogger implements ILoggerService {
     }
 
     error(text: any): void {
-        console.error(text)
+        const date = new Date() + " | "
+        console.error(date + this.errorPrefix + text)
     }
 
     log(text: string): void {
         if (!this.enabled) return
-        console.log(text)
+        const date = new Date() + " | "
+        console.log(date + text)
     }
 }

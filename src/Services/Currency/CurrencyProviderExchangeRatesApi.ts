@@ -5,7 +5,7 @@ import {CurrencyRatio} from "./CurrencyRatio"
 export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
 
     private readonly apiUrl: string = "https://api.exchangeratesapi.io/v1/latest"
-    private readonly apiKey:string = "e4bc5f02eb4d7bd6ade74a71ade2089c"
+    private readonly apiKey: string = "e4bc5f02eb4d7bd6ade74a71ade2089c"
     private readonly baseUrl: string = this.apiUrl + "?access_key=" + this.apiKey
     private readonly webRequestService: IWebRequestService
 
@@ -14,6 +14,7 @@ export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
     }
 
     async getCurrencyRatio(currencies: string[]): Promise<CurrencyRatio | null> {
+
         const response = await this.webRequestService.tryGet(this.baseUrl)
         if (this.isNotValidResponse(response)) return null
 

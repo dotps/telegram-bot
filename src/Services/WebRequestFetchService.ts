@@ -5,15 +5,22 @@ export class WebRequestFetchService implements IWebRequestService {
 
     async tryGet(url: string): Promise<any> {
         try {
+            Logger.log(`Query: ${url}`)
+
             const response = await fetch(url)
+            const responseData = await response.json()
+
+            Logger.log(`Response: ${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
+
             if (!response.ok) {
-                Logger.error(`Ошибка: ${response.status} ${response.statusText}`)
+                Logger.error(`${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
                 return null
             }
-            return await response.json()
+
+            return responseData
         }
         catch (e) {
-            Logger.error(`Ошибка: ${e}`)
+            Logger.error(`${e}`)
             return null
         }
     }

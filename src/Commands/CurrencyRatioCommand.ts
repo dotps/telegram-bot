@@ -1,6 +1,7 @@
 import {ICommand} from "./ICommand"
 import {ResponseData} from "../Data/ResponseData"
 import {ICurrencyService} from "../Services/Currency/ICurrencyService"
+import {Logger} from "../Utils/Logger"
 
 export class CurrencyRatioCommand implements ICommand {
 
@@ -13,7 +14,10 @@ export class CurrencyRatioCommand implements ICommand {
 
     async execute(currencies:string[] = []): Promise<ResponseData | null> {
         const currencyRatio = await this.currencyService.getCurrencyRatio(currencies)
-        if (!currencyRatio) return new ResponseData([this.responseError])
+        if (!currencyRatio) {
+            Logger.error(this.constructor.name + ", currencyRatio is null" + this.responseError)
+            return new ResponseData([this.responseError])
+        }
 
         const responseSuccess = `Текущий курс ${currencyRatio.firstCurrency} к ${currencyRatio.secondCurrency}: ${currencyRatio.ratio}.`
         return new ResponseData([responseSuccess])

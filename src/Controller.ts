@@ -11,7 +11,7 @@ export class Controller {
     private commandFactory: ICommandFactory
     private currencyService: ICurrencyService
     private model: IModel
-    private defaultResponse: string[] = [`Неизвестная команда.`]
+    private defaultResponse: string = "Неизвестная команда."
 
     constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService) {
         this.currencyService = currencyService
@@ -37,7 +37,7 @@ export class Controller {
 
             responseData = (command)
                 ? await command.execute(currencies)
-                : new ResponseData(this.defaultResponse)
+                : new ResponseData([this.defaultResponse])
 
             this.inputOutputService.sendResponse(responseData)
         }
