@@ -4,16 +4,21 @@ import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
 import {Commands} from "./Commands/Commands"
 import {ICurrencyService} from "./Services/Currency/ICurrencyService"
+import {TelegramCommands} from "./Services/Bots/TelegramCommands"
+import {IBotProvider} from "./Services/Bots/IBotProvider"
+import {Logger} from "./Utils/Logger"
 
 export class Controller {
 
     private readonly inputOutputService: IInputOutputService
     private commandFactory: ICommandFactory
+    private botProvider: IBotProvider
     private currencyService: ICurrencyService
     private model: IModel
     private defaultResponse: string = "Неизвестная команда."
 
-    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService) {
+    constructor(model: IModel, inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService, botProvider: IBotProvider) {
+        this.botProvider = botProvider
         this.currencyService = currencyService
         this.model = model
         this.commandFactory = commandFactory
@@ -21,6 +26,9 @@ export class Controller {
     }
 
     async run() {
+
+        await this.botProvider.init()
+        console.log(this.botProvider.getBotId())
 
         while (this.model.isAppRunning()) {
 
