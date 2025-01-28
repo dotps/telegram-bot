@@ -1,5 +1,4 @@
 import {InputOutputConsoleService} from "./Services/InputOutputConsoleService"
-import {Controller} from "./Controller"
 import {CommandFactory} from "./Factory/CommandFactory"
 import {Model} from "./Model/Model"
 import {CurrencyService} from "./Services/Currency/CurrencyService"
@@ -16,7 +15,7 @@ import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {TelegramApiProvider} from "./Services/Bots/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
 
-Logger.init(new ConsoleLogger(false))
+Logger.init(new ConsoleLogger(true))
 
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
@@ -24,12 +23,17 @@ const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestServi
 const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
-// const inputOutputService: IInputOutputService = new InputOutputConsoleService(model, currencyService, commandFactory)
-const inputOutputService: IInputOutputService = new InputOutputHTTPService(botProvider)
-const app = new Controller(model, inputOutputService, commandFactory, currencyService, botProvider)
 
-app.run()
+const isUseHttpServer = true
+const inputOutputService: IInputOutputService = (isUseHttpServer)
+    ? new InputOutputHTTPService(botProvider)
+    : new InputOutputConsoleService(model, currencyService, commandFactory)
+
+// const app = new Conntroller(model, inputOutputService, commandFactory, currencyService, botProvider)
+// app.run()
+
+inputOutputService.start()
 
 // (async () => {
-//     app.run()
+//
 // })()

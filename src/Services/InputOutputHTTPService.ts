@@ -19,51 +19,59 @@ export class InputOutputHTTPService implements IInputOutputService {
 
     private async handleGetRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
 
-        // TODO: реализовать обработку запросов сервером
+        const responseData = new ResponseData()
 
-        if (request.method === "GET" && request.url?.startsWith(this.queryMethod)) {
-            try {
-                // Парсим URL и извлекаем query-параметры
-                const url = new URL(request.url, `http://${request.headers.host}`)
-                const queryParams = url.searchParams
-
-                // Создаем объект QueryData из query-параметров
-                const queryData: QueryData = {
-                    text: queryParams.get("text") || '' // Пример: /query?text=Hello
-                }
-
-                // Обрабатываем запрос
-                const responseData = await this.processQuery(queryData)
-
-                // Отправляем ответ
-                response.writeHead(200, { 'Content-Type': 'application/json' })
-                response.end(JSON.stringify(responseData))
-            } catch (error) {
-                response.writeHead(500, { 'Content-Type': 'application/json' })
-                response.end(JSON.stringify({ error: 'Internal Server Error' }))
-            }
-        } else {
+        if (request.method !== "GET" || !request.url?.startsWith(this.queryMethod)) {
+            responseData.data.push("Ошибка!")
             response.writeHead(404, { 'Content-Type': 'application/json' })
-            response.end(JSON.stringify({ error: 'Not Found' }))
+            response.end(JSON.stringify(responseData))
+            return
         }
+
+        try {
+            // Парсим URL и извлекаем query-параметры
+            const url = new URL(request.url, `http://${request.headers.host}`)
+            console.log(url)
+            const queryParams = url.searchParams
+            console.log(queryParams)
+
+            // Создаем объект QueryData из query-параметров
+            const queryData: QueryData = {
+                text: queryParams.get("text") || '' // Пример: /query?text=Hello
+            }
+            console.log(queryData)
+
+            // Обрабатываем запрос
+            const responseData = await this.processQuery(queryData)
+
+            // Отправляем ответ
+            response.writeHead(200, { 'Content-Type': 'application/json' })
+            response.end(JSON.stringify(responseData))
+        } catch (error) {
+            response.writeHead(500, { 'Content-Type': 'application/json' })
+            response.end(JSON.stringify({ error: 'Internal Server Error' }))
+        }
+
     }
 
     private async processQuery(queryData: QueryData): Promise<ResponseData> {
-        // Имитация асинхронной обработки
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
         return {
             data: [`Processed query: ${queryData.text}`]
         }
     }
 
     async start(): Promise<void> {
-
         await this.botProvider.init()
 
         this.server.listen(this.port, () => {
             Logger.log("Сервер запущен.")
         })
+
+        // await this.botProvider.sendResponse("Привет!")
+
+        setInterval(async () => {
+            await this.botProvider.getUpdates()
+        }, 5000)
     }
 
     close(): void {
@@ -72,3 +80,14 @@ export class InputOutputHTTPService implements IInputOutputService {
         })
     }
 }
+
+class TelegramUpdatePostResponse {
+    updateId: number
+    text: string
+
+    constructor(data: any) {
+        this.updateId = data?.update_id || 0
+        this.text = data?.message?.text || ""
+    }
+}
+
