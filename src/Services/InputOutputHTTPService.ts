@@ -7,6 +7,7 @@ import {IBotProvider} from "./Bots/IBotProvider"
 import {Commands} from "../Commands/Commands"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
+import {LogicController} from "../LogicController"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
@@ -14,15 +15,12 @@ export class InputOutputHTTPService implements IInputOutputService {
     private botProvider: IBotProvider
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
-    private commandFactory: ICommandFactory
-    private currencyService: ICurrencyService
-    private defaultResponse: string = "Неизвестная команда."
+    private controller: LogicController
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
-        this.commandFactory = commandFactory
-        this.currencyService = currencyService
         this.botProvider = botProvider
         this.server = createServer(this.handleGetRequest.bind(this))
+        this.controller = new LogicController(this, commandFactory, currencyService)
     }
 
     private async handleGetRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -76,29 +74,13 @@ export class InputOutputHTTPService implements IInputOutputService {
             Logger.log("Сервер запущен.")
         })
 
-        let responseData: ResponseData | null = null
-
+        // TODO: вынести в метод
         setInterval(async () => {
 
             const queryData = await this.botProvider.getUpdates()
             if (!queryData.text) return
 
-            let input = queryData.text.toLowerCase().trim()
-
-            // TODO: нужно логику вынести в общий метод для различных сервисов http/console, возможно даже пересмотреть ее
-            // не нравится постоянная отправка currencies в command.execute(currencies) когда не надо
-            const currencies = this.currencyService.parseCurrencyCodes(input)
-            if (currencies) {
-                input = Commands.CURRENCY_RATIO
-            }
-
-            const command = this.commandFactory.createCommand(input)
-
-            responseData = (command)
-                ? await command.execute(currencies)
-                : new ResponseData([this.defaultResponse])
-
-            await this.sendResponse(responseData)
+            await this.controller.run(queryData)
 
         }, 5000)
     }

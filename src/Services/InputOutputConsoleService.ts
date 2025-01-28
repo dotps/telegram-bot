@@ -6,6 +6,7 @@ import {IModel} from "../Model/IModel"
 import {Commands} from "../Commands/Commands"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
+import {LogicController} from "../LogicController"
 
 export class InputOutputConsoleService implements IInputOutputService {
 
@@ -14,12 +15,14 @@ export class InputOutputConsoleService implements IInputOutputService {
     private currencyService: ICurrencyService
     private model: IModel
     private beforeCursorText: string = "> "
-    private defaultResponse: string = "Неизвестная команда."
+    // private defaultResponse: string = "Неизвестная команда."
+    private controller: LogicController
 
     constructor(model:IModel, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.commandFactory = commandFactory
         this.currencyService = currencyService
         this.model = model
+        this.controller = new LogicController(this, commandFactory, currencyService)
         this.readlineService = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -39,6 +42,10 @@ export class InputOutputConsoleService implements IInputOutputService {
 
             let responseData: ResponseData | null = null
             const queryData = await this.getQuery()
+
+            await this.controller.run(queryData)
+
+            /*
             let input = queryData.text.toLowerCase().trim()
 
             // TODO: нужно логику вынести в общий метод для различных сервисов http/console, возможно даже пересмотреть ее
@@ -54,7 +61,7 @@ export class InputOutputConsoleService implements IInputOutputService {
                 ? await command.execute(currencies)
                 : new ResponseData([this.defaultResponse])
 
-            this.sendResponse(responseData)
+            this.sendResponse(responseData)*/
         }
 
         this.close()
@@ -64,7 +71,7 @@ export class InputOutputConsoleService implements IInputOutputService {
         this.readlineService.close()
     }
 
-    sendResponse(response: ResponseData | null): void {
+    async sendResponse(response: ResponseData | null): Promise<void> {
         if (!response)
             return
 
