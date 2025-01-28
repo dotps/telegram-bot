@@ -10,17 +10,18 @@ export class InputOutputHTTPService implements IInputOutputService {
     private server: Server
     private botProvider: IBotProvider
     private readonly port: number = 3000
+    private readonly queryMethod: string = "/query"
 
     constructor(botProvider: IBotProvider) {
         this.botProvider = botProvider
-        this.server = createServer(this.handleRequest.bind(this))
+        this.server = createServer(this.handleGetRequest.bind(this))
     }
 
-    private async handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    private async handleGetRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
 
         // TODO: реализовать обработку запросов сервером
 
-        if (request.method === 'GET' && request.url?.startsWith('/query')) {
+        if (request.method === "GET" && request.url?.startsWith(this.queryMethod)) {
             try {
                 // Парсим URL и извлекаем query-параметры
                 const url = new URL(request.url, `http://${request.headers.host}`)
@@ -28,7 +29,7 @@ export class InputOutputHTTPService implements IInputOutputService {
 
                 // Создаем объект QueryData из query-параметров
                 const queryData: QueryData = {
-                    text: queryParams.get('text') || '' // Пример: /query?text=Hello
+                    text: queryParams.get("text") || '' // Пример: /query?text=Hello
                 }
 
                 // Обрабатываем запрос
