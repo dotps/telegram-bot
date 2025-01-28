@@ -1,6 +1,8 @@
+import {QueryData} from "../../Data/QueryData"
+
 export interface IBotProvider {
-    sendResponse(method: string): Promise<void>
-    getUpdates(): Promise<void>
+    sendResponse(text: string): Promise<void>
+    getUpdates(): Promise<QueryData>
     init(): Promise<void>
     getBotId(): number
 }

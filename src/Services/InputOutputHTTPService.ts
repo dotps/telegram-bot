@@ -4,6 +4,9 @@ import {QueryData} from "../Data/QueryData"
 import {createServer, IncomingMessage, Server, ServerResponse} from "node:http"
 import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
+import {Commands} from "../Commands/Commands"
+import {ICurrencyService} from "./Currency/ICurrencyService"
+import {ICommandFactory} from "../Factory/ICommandFactory"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
@@ -11,8 +14,13 @@ export class InputOutputHTTPService implements IInputOutputService {
     private botProvider: IBotProvider
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
+    private commandFactory: ICommandFactory
+    private currencyService: ICurrencyService
+    private defaultResponse: string = "Неизвестная команда."
 
-    constructor(botProvider: IBotProvider) {
+    constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
+        this.commandFactory = commandFactory
+        this.currencyService = currencyService
         this.botProvider = botProvider
         this.server = createServer(this.handleGetRequest.bind(this))
     }
@@ -61,16 +69,37 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     async start(): Promise<void> {
+
         await this.botProvider.init()
 
         this.server.listen(this.port, () => {
             Logger.log("Сервер запущен.")
         })
 
-        // await this.botProvider.sendResponse("Привет!")
+        let responseData: ResponseData | null = null
 
         setInterval(async () => {
-            await this.botProvider.getUpdates()
+
+            const queryData = await this.botProvider.getUpdates()
+            if (!queryData.text) return
+
+            let input = queryData.text.toLowerCase().trim()
+
+            // TODO: нужно логику вынести в общий метод для различных сервисов http/console, возможно даже пересмотреть ее
+            // не нравится постоянная отправка currencies в command.execute(currencies) когда не надо
+            const currencies = this.currencyService.parseCurrencyCodes(input)
+            if (currencies) {
+                input = Commands.CURRENCY_RATIO
+            }
+
+            const command = this.commandFactory.createCommand(input)
+
+            responseData = (command)
+                ? await command.execute(currencies)
+                : new ResponseData([this.defaultResponse])
+
+            await this.sendResponse(responseData)
+
         }, 5000)
     }
 
@@ -78,6 +107,16 @@ export class InputOutputHTTPService implements IInputOutputService {
         this.server.close(() => {
             Logger.log("Сервер остановлен.")
         })
+    }
+
+    async sendResponse(response: ResponseData | null): Promise<void> {
+        if (!response)
+            return
+
+        const data = response?.data || []
+        for (const text of data) {
+            await this.botProvider.sendResponse(text)
+        }
     }
 }
 

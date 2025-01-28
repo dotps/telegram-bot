@@ -4,6 +4,8 @@ import {Logger} from "../../Utils/Logger"
 import {TelegramCommands} from "./TelegramCommands"
 import {IModel} from "../../Model/IModel"
 import {QueryData} from "../../Data/QueryData"
+import {Commands} from "../../Commands/Commands"
+import {ResponseData} from "../../Data/ResponseData"
 
 export class TelegramApiProvider implements IBotProvider {
 
@@ -47,7 +49,7 @@ export class TelegramApiProvider implements IBotProvider {
         const botResponse = await this.webRequestService.tryGet(url)
     }
 
-    async getUpdates(): Promise<void> {
+    async getUpdates(): Promise<QueryData> {
         const offset = (this.lastUpdateId) ? `offset=${this.lastUpdateId + 1}&` : ``
         const botResponse = await this.webRequestService.tryGet(`${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`)
         let queryData: QueryData = {
@@ -57,7 +59,6 @@ export class TelegramApiProvider implements IBotProvider {
         if (botResponse?.ok) {
             const updatesResponse = new TelegramGetUpdatesResponse(botResponse?.result)
             if (updatesResponse) {
-                // this.lastUpdateId = updatesResponse.getLastUpdateId()
                 const lastUpdate = updatesResponse.getLastUpdate()
                 if (lastUpdate) {
                     this.lastUpdateId = lastUpdate.updateId
@@ -74,6 +75,8 @@ export class TelegramApiProvider implements IBotProvider {
             // TODO: подключить метод парсинга команды и запуска команд
             console.log(queryData)
         }
+
+        return queryData
     }
 }
 

@@ -15,7 +15,7 @@ import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {TelegramApiProvider} from "./Services/Bots/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
 
-Logger.init(new ConsoleLogger(true))
+Logger.init(new ConsoleLogger(false))
 
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
@@ -26,10 +26,10 @@ const commandFactory: ICommandFactory = new CommandFactory(model, currencyServic
 
 const isUseHttpServer = true
 const inputOutputService: IInputOutputService = (isUseHttpServer)
-    ? new InputOutputHTTPService(botProvider)
+    ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
     : new InputOutputConsoleService(model, currencyService, commandFactory)
 
-// const app = new Conntroller(model, inputOutputService, commandFactory, currencyService, botProvider)
+// const app = new Controller(model, inputOutputService, commandFactory, currencyService, botProvider)
 // app.run()
 
 inputOutputService.start()
