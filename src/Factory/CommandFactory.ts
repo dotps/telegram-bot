@@ -28,7 +28,8 @@ export class CommandFactory implements ICommandFactory {
             case Commands.CURRENCY:
                 return new CurrencyCommand(this.currencyService)
             case Commands.CURRENCY_RATIO:
-                return new CurrencyRatioCommand(this.currencyService, commandData?.params?.currencies)
+                const currencies = commandData?.params?.currencies || null
+                return new CurrencyRatioCommand(this.currencyService, currencies)
             default:
                 return null
         }

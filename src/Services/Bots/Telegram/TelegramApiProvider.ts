@@ -12,9 +12,9 @@ export class TelegramApiProvider implements IBotProvider {
 
     private readonly apiUrl: string = "https://api.telegram.org/bot"
     private readonly token: string = "7727862535:AAGq0VKfRaOeXCPB5v1R02ct8IydXDslt-c"
-    private model: IModel
     private readonly baseUrl: string = this.apiUrl + this.token + "/"
     private readonly webRequestService: IWebRequestService
+    private model: IModel
     private lastUpdateId: number = 0
     private errorMessage: string = "Telegram не ok: "
 

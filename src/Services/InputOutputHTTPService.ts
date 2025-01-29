@@ -10,19 +10,19 @@ import {IQueryData} from "../Data/IQueryData"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
-    private server: Server
-    private botProvider: IBotProvider
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
-    private commandHandler: CommandHandler
-    private updateInterval: number = 5000
-    private responseHeaders: OutgoingHttpHeaders = {"Content-Type": "application/json"}
+    private readonly isUseWebhook = true
+    private readonly server: Server
+    private readonly botProvider: IBotProvider
+    private readonly commandHandler: CommandHandler
+    private readonly updateInterval: number = 5000
+    private readonly responseHeaders: OutgoingHttpHeaders = {"Content-Type": "application/json"}
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.botProvider = botProvider
         this.server = createServer(this.handlePostRequest.bind(this))
         this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
-        // TODO: CommandHandler можно перенести в провайдеров бота
     }
 
     private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -54,6 +54,7 @@ export class InputOutputHTTPService implements IInputOutputService {
         } catch (error) {
             response.writeHead(ResponseCodes.ERROR, this.responseHeaders)
             response.end()
+            Logger.error("Ошибка: " + JSON.stringify(error))
         }
     }
 
@@ -61,11 +62,14 @@ export class InputOutputHTTPService implements IInputOutputService {
 
         await this.botProvider.init()
 
-        this.server.listen(this.port, () => {
-            Logger.log("Сервер запущен.")
-        })
-
-        // this.getBotUpdates()
+        if (this.isUseWebhook) {
+            this.server.listen(this.port, () => {
+                Logger.log("Сервер запущен.")
+            })
+        }
+        else {
+            this.getBotUpdates()
+        }
     }
 
     stop(): void {
@@ -84,11 +88,13 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     private getBotUpdates() {
+
         setInterval(async () => {
             const queryData = await this.botProvider.getUpdates()
             if (!queryData.text) return
             await this.commandHandler.handleQuery(queryData)
         }, this.updateInterval)
+
     }
 }
 

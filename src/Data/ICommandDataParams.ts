@@ -1,3 +1,3 @@
 export interface ICommandDataParams {
-    currencies: string[] | null
+    currencies?: string[] | null
 }
