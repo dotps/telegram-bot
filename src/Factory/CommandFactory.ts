@@ -7,8 +7,8 @@ import {IModel} from "../Model/IModel"
 import {CurrencyCommand} from "../Commands/CurrencyCommand"
 import {CurrencyRatioCommand} from "../Commands/CurrencyRatioCommand"
 import {ICurrencyService} from "../Services/Currency/ICurrencyService"
-import {IInputOutputService} from "../Services/IInputOutputService"
-import {CommandData} from "../CommandHandler"
+
+import {CommandData} from "../Data/CommandData"
 
 export class CommandFactory implements ICommandFactory {
     private readonly model: IModel

@@ -7,7 +7,7 @@ export class CurrencyRatioCommand implements ICommand {
 
     private currencyService: ICurrencyService
     private responseError: string = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
-    private currencies: string[] | null
+    private readonly currencies: string[] | null
 
     constructor(currencyService: ICurrencyService, currencies: string[] | null) {
         this.currencies = currencies

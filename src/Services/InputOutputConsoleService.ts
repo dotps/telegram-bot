@@ -1,12 +1,12 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {createInterface, Interface} from "node:readline/promises"
 import {ResponseData} from "../Data/ResponseData"
-import {IQueryData, ConsoleQueryData} from "../Data/ConsoleQueryData"
+import {ConsoleQueryData} from "../Data/ConsoleQueryData"
 import {IModel} from "../Model/IModel"
-import {Commands} from "../Commands/Commands"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
-import {CommandHandler} from "../CommandHandler"
+import {CommandHandler} from "../Commands/CommandHandler"
+import {IQueryData} from "../Data/IQueryData"
 
 export class InputOutputConsoleService implements IInputOutputService {
 
@@ -44,8 +44,7 @@ export class InputOutputConsoleService implements IInputOutputService {
     }
 
     async sendResponse(response: ResponseData | null): Promise<void> {
-        if (!response)
-            return
+        if (!response) return
 
         const data = response?.data || []
         for (const text of data) {

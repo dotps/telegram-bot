@@ -1,12 +1,13 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {ResponseData} from "../Data/ResponseData"
-import {IQueryData, ConsoleQueryData, TelegramQueryData} from "../Data/ConsoleQueryData"
+import {ConsoleQueryData} from "../Data/ConsoleQueryData"
 import {createServer, IncomingMessage, Server, ServerResponse} from "node:http"
 import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
-import {CommandHandler} from "../CommandHandler"
+import {CommandHandler} from "../Commands/CommandHandler"
+import {IQueryData} from "../Data/IQueryData"
 
 export class InputOutputHTTPService implements IInputOutputService {
 

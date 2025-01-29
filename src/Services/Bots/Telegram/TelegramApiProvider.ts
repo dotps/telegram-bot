@@ -3,9 +3,10 @@ import {IWebRequestService} from "../../IWebRequestService"
 import {Logger} from "../../../Utils/Logger"
 import {TelegramCommands} from "./TelegramCommands"
 import {IModel} from "../../../Model/IModel"
-import {IQueryData, TelegramQueryData} from "../../../Data/ConsoleQueryData"
-import {TelegramBaseResponse} from "./TelegramBaseResponse"
-import {TelegramGetUpdatesResponse} from "./TelegramGetUpdatesResponse"
+import {TelegramBaseResponse} from "../../../Data/Telegram/TelegramBaseResponse"
+import {TelegramGetUpdatesResponse} from "../../../Data/Telegram/TelegramGetUpdatesResponse"
+import {TelegramQueryData} from "../../../Data/Telegram/TelegramQueryData"
+import {IQueryData} from "../../../Data/IQueryData"
 
 export class TelegramApiProvider implements IBotProvider {
 
@@ -34,10 +35,6 @@ export class TelegramApiProvider implements IBotProvider {
         else {
             Logger.error("Не удалось инициализировать бота.")
         }
-    }
-
-    getBotId(): number {
-        return this.botId
     }
 
     async sendResponse(text: string, queryData: IQueryData): Promise<void> {

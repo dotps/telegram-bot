@@ -1,13 +1,10 @@
-import {IInputOutputService} from "./Services/IInputOutputService"
-import {ICommandFactory} from "./Factory/ICommandFactory"
-import {ResponseData} from "./Data/ResponseData"
-import {IModel} from "./Model/IModel"
-import {Commands} from "./Commands/Commands"
-import {ICurrencyService} from "./Services/Currency/ICurrencyService"
-import {TelegramCommands} from "./Services/Bots/Telegram/TelegramCommands"
-import {IBotProvider} from "./Services/Bots/IBotProvider"
-import {Logger} from "./Utils/Logger"
-import {IQueryData, ConsoleQueryData} from "./Data/ConsoleQueryData"
+import {IInputOutputService} from "../Services/IInputOutputService"
+import {ICommandFactory} from "../Factory/ICommandFactory"
+import {ResponseData} from "../Data/ResponseData"
+import {Commands} from "./Commands"
+import {ICurrencyService} from "../Services/Currency/ICurrencyService"
+import {IQueryData} from "../Data/IQueryData"
+import {CommandData} from "../Data/CommandData"
 
 export class CommandHandler {
 
@@ -42,16 +39,3 @@ export class CommandHandler {
 
 }
 
-export class CommandData {
-    input: string
-    params: ICommandDataParams
-
-    constructor(input: string, params: ICommandDataParams) {
-        this.input = input
-        this.params = params
-    }
-}
-
-export interface ICommandDataParams {
-    currencies: string[] | null
-}

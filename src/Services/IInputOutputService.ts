@@ -1,5 +1,5 @@
 import {ResponseData} from "../Data/ResponseData"
-import {IQueryData} from "../Data/ConsoleQueryData"
+import {IQueryData} from "../Data/IQueryData"
 
 export interface IInputOutputService {
     start(): void

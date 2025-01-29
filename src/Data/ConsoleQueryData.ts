@@ -1,18 +1,4 @@
-// export type QueryData = {
-//     text: string
-// }
-
-export class TelegramQueryData implements IQueryData {
-    text: string
-    updateId: number
-    chatId: number
-
-    constructor(data?: any) {
-        this.text = data?.text || ""
-        this.updateId = data?.updateId || 0
-        this.chatId = data?.chatId || 0
-    }
-}
+import {IQueryData} from "./IQueryData"
 
 export class ConsoleQueryData implements IQueryData {
     text: string
@@ -22,6 +8,3 @@ export class ConsoleQueryData implements IQueryData {
     }
 }
 
-export interface IQueryData {
-    text: string
-}
