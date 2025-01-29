@@ -15,7 +15,6 @@ export class TelegramApiProvider implements IBotProvider {
     private model: IModel
     private readonly baseUrl: string = this.apiUrl + this.token + "/"
     private readonly webRequestService: IWebRequestService
-    private botId: number = 0
     private lastUpdateId: number = 0
     private errorMessage: string = "Telegram не ok: "
 
@@ -24,13 +23,10 @@ export class TelegramApiProvider implements IBotProvider {
         this.webRequestService = webRequestService
     }
 
-
-
     public async init(): Promise<void> {
         const response = await this.webRequestService.tryGet(this.baseUrl + TelegramCommands.GET_ME)
         const initResponse = new TelegramBaseResponse(response)
         if (initResponse.ok) {
-            this.botId = initResponse.result.id
             this.model.botWasInit()
             return
         }
@@ -62,14 +58,7 @@ export class TelegramApiProvider implements IBotProvider {
         const response = new TelegramBaseResponse(botResponse)
 
         if (response.ok) {
-            const updatesResponse = new TelegramGetUpdatesResponse(response.result)
-            if (updatesResponse) {
-                const lastUpdate = updatesResponse.getLastUpdate()
-                if (lastUpdate) {
-                    this.lastUpdateId = lastUpdate.updateId
-                    queryData = new TelegramQueryData(lastUpdate)
-                }
-            }
+            queryData = await this.handleUpdate(response.result)
         }
         else {
             Logger.error(this.errorMessage + JSON.stringify(response))
@@ -78,9 +67,10 @@ export class TelegramApiProvider implements IBotProvider {
         return queryData
     }
 
-    async handleUpdate(requestData: any): Promise<IQueryData> {
-        const updateData = new TelegramGetUpdatesResponse(requestData)
+    async handleUpdate(requestData: any): Promise<TelegramQueryData> {
+
         let queryData = new TelegramQueryData()
+        const updateData = new TelegramGetUpdatesResponse(requestData)
 
         if (updateData) {
             const lastUpdate = updateData.getLastUpdate()

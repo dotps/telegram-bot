@@ -1,6 +1,5 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {ResponseData} from "../Data/ResponseData"
-import {ConsoleQueryData} from "../Data/ConsoleQueryData"
 import {createServer, IncomingMessage, OutgoingHttpHeaders, Server, ServerResponse} from "node:http"
 import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
@@ -8,8 +7,6 @@ import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
 import {CommandHandler} from "../Commands/CommandHandler"
 import {IQueryData} from "../Data/IQueryData"
-import {TelegramQueryData} from "../Data/Telegram/TelegramQueryData"
-import {TelegramGetUpdatesResponse} from "../Data/Telegram/TelegramGetUpdatesResponse"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
@@ -60,12 +57,6 @@ export class InputOutputHTTPService implements IInputOutputService {
         }
     }
 
-    private async processQuery(queryData: ConsoleQueryData): Promise<ResponseData> {
-        return {
-            data: [`Processed query: ${queryData.text}`]
-        }
-    }
-
     async start(): Promise<void> {
 
         await this.botProvider.init()
@@ -74,7 +65,7 @@ export class InputOutputHTTPService implements IInputOutputService {
             Logger.log("Сервер запущен.")
         })
 
-        this.getBotUpdates()
+        // this.getBotUpdates()
     }
 
     stop(): void {
