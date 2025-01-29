@@ -15,7 +15,7 @@ import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {TelegramApiProvider} from "./Services/Bots/Telegram/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
 
-Logger.init(new ConsoleLogger(false))
+Logger.init(new ConsoleLogger(true))
 
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()

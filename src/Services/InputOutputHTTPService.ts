@@ -1,13 +1,15 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {ResponseData} from "../Data/ResponseData"
 import {ConsoleQueryData} from "../Data/ConsoleQueryData"
-import {createServer, IncomingMessage, Server, ServerResponse} from "node:http"
+import {createServer, IncomingMessage, OutgoingHttpHeaders, Server, ServerResponse} from "node:http"
 import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
 import {CommandHandler} from "../Commands/CommandHandler"
 import {IQueryData} from "../Data/IQueryData"
+import {TelegramQueryData} from "../Data/Telegram/TelegramQueryData"
+import {TelegramGetUpdatesResponse} from "../Data/Telegram/TelegramGetUpdatesResponse"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
@@ -17,49 +19,45 @@ export class InputOutputHTTPService implements IInputOutputService {
     private readonly queryMethod: string = "/query"
     private commandHandler: CommandHandler
     private updateInterval: number = 5000
+    private responseHeaders: OutgoingHttpHeaders = {"Content-Type": "application/json"}
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.botProvider = botProvider
-        this.server = createServer(this.handleGetRequest.bind(this))
+        this.server = createServer(this.handlePostRequest.bind(this))
         this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
+        // TODO: CommandHandler можно перенести в провайдеров бота
     }
 
-    private async handleGetRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
 
-        const responseData = new ResponseData()
-
-        if (request.method !== "GET" || !request.url?.startsWith(this.queryMethod)) {
-            responseData.data.push("Ошибка!")
-            response.writeHead(404, { 'Content-Type': 'application/json' })
-            response.end(JSON.stringify(responseData))
+        if (request.method !== "POST" || !request.url?.startsWith(this.queryMethod)) {
+            response.writeHead(ResponseCodes.NOT_FOUND, this.responseHeaders)
+            response.end()
             return
         }
 
-        /*
         try {
-            // Парсим URL и извлекаем query-параметры
-            const url = new URL(request.url, `http://${request.headers.host}`)
-            console.log(url)
-            const queryParams = url.searchParams
-            console.log(queryParams)
 
-            // Создаем объект QueryData из query-параметров
-            const queryData: QueryData = {
-                text: queryParams.get("text") || '' // Пример: /query?text=Hello
-            }
-            console.log(queryData)
+            let body = ''
 
-            // Обрабатываем запрос
-            const responseData = await this.processQuery(queryData)
+            request.on('data', chunk => {
+                body += chunk.toString()
+            })
 
-            // Отправляем ответ
-            response.writeHead(200, { 'Content-Type': 'application/json' })
-            response.end(JSON.stringify(responseData))
+            request.on('end', async () => {
+
+                response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
+                response.end()
+
+                const requestData = [JSON.parse(body)]
+                const queryData = await this.botProvider.handleUpdate(requestData)
+                await this.commandHandler.handleQuery(queryData)
+            })
+
         } catch (error) {
-            response.writeHead(500, { 'Content-Type': 'application/json' })
-            response.end(JSON.stringify({ error: 'Internal Server Error' }))
-        }*/
-
+            response.writeHead(ResponseCodes.ERROR, this.responseHeaders)
+            response.end()
+        }
     }
 
     private async processQuery(queryData: ConsoleQueryData): Promise<ResponseData> {
@@ -103,3 +101,8 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 }
 
+export enum ResponseCodes {
+    SUCCESS = 200,
+    NOT_FOUND = 404,
+    ERROR = 500,
+}

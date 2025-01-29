@@ -24,6 +24,8 @@ export class TelegramApiProvider implements IBotProvider {
         this.webRequestService = webRequestService
     }
 
+
+
     public async init(): Promise<void> {
         const response = await this.webRequestService.tryGet(this.baseUrl + TelegramCommands.GET_ME)
         const initResponse = new TelegramBaseResponse(response)
@@ -71,6 +73,21 @@ export class TelegramApiProvider implements IBotProvider {
         }
         else {
             Logger.error(this.errorMessage + JSON.stringify(response))
+        }
+
+        return queryData
+    }
+
+    async handleUpdate(requestData: any): Promise<IQueryData> {
+        const updateData = new TelegramGetUpdatesResponse(requestData)
+        let queryData = new TelegramQueryData()
+
+        if (updateData) {
+            const lastUpdate = updateData.getLastUpdate()
+            if (lastUpdate) {
+                this.lastUpdateId = lastUpdate.updateId
+                queryData = new TelegramQueryData(lastUpdate)
+            }
         }
 
         return queryData
