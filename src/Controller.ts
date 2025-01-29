@@ -4,7 +4,7 @@ import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
 import {Commands} from "./Commands/Commands"
 import {ICurrencyService} from "./Services/Currency/ICurrencyService"
-import {TelegramCommands} from "./Services/Bots/TelegramCommands"
+import {TelegramCommands} from "./Services/Bots/Telegram/TelegramCommands"
 import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {Logger} from "./Utils/Logger"
 

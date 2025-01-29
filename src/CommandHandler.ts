@@ -4,10 +4,10 @@ import {ResponseData} from "./Data/ResponseData"
 import {IModel} from "./Model/IModel"
 import {Commands} from "./Commands/Commands"
 import {ICurrencyService} from "./Services/Currency/ICurrencyService"
-import {TelegramCommands} from "./Services/Bots/TelegramCommands"
+import {TelegramCommands} from "./Services/Bots/Telegram/TelegramCommands"
 import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {Logger} from "./Utils/Logger"
-import {QueryData} from "./Data/QueryData"
+import {IQueryData, ConsoleQueryData} from "./Data/ConsoleQueryData"
 
 export class CommandHandler {
 
@@ -22,7 +22,7 @@ export class CommandHandler {
         this.inputOutputService = inputOutputService
     }
 
-    async handleQuery(queryData: QueryData) {
+    async handleQuery(queryData: IQueryData) {
 
         let responseData: ResponseData | null
         let input = queryData.text.toLowerCase().trim()
@@ -37,7 +37,7 @@ export class CommandHandler {
             ? await command.execute(currencies)
             : new ResponseData([this.defaultResponse])
 
-        await this.inputOutputService.sendResponse(responseData)
+        await this.inputOutputService.sendResponse(responseData, queryData)
     }
 
 }

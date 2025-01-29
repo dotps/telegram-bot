@@ -12,7 +12,7 @@ import {ICurrencyProvider} from "./Services/Currency/ICurrencyProvider"
 import {ICurrencyService} from "./Services/Currency/ICurrencyService"
 import {ICommandFactory} from "./Factory/ICommandFactory"
 import {IBotProvider} from "./Services/Bots/IBotProvider"
-import {TelegramApiProvider} from "./Services/Bots/TelegramApiProvider"
+import {TelegramApiProvider} from "./Services/Bots/Telegram/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
 
 Logger.init(new ConsoleLogger(false))
@@ -24,7 +24,7 @@ const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 
-const isUseHttpServer = true
+const isUseHttpServer = false
 const inputOutputService: IInputOutputService = (isUseHttpServer)
     ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
     : new InputOutputConsoleService(model, currencyService, commandFactory)

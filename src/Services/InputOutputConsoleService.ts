@@ -1,7 +1,7 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {createInterface, Interface} from "node:readline/promises"
 import {ResponseData} from "../Data/ResponseData"
-import {QueryData} from "../Data/QueryData"
+import {IQueryData, ConsoleQueryData} from "../Data/ConsoleQueryData"
 import {IModel} from "../Model/IModel"
 import {Commands} from "../Commands/Commands"
 import {ICurrencyService} from "./Currency/ICurrencyService"
@@ -24,17 +24,15 @@ export class InputOutputConsoleService implements IInputOutputService {
         })
     }
 
-    async getQuery(): Promise<QueryData> {
+    async getUpdates(): Promise<IQueryData> {
         const text = await this.readlineService.question(this.beforeCursorText)
-        return {
-            text: text
-        }
+        return new ConsoleQueryData({text: text})
     }
 
     async start(): Promise<void> {
 
         while (this.model.isAppRunning()) {
-            const queryData = await this.getQuery()
+            const queryData = await this.getUpdates()
             await this.commandHandler.handleQuery(queryData)
         }
 

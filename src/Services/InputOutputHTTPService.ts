@@ -1,6 +1,6 @@
 import {IInputOutputService} from "./IInputOutputService"
 import {ResponseData} from "../Data/ResponseData"
-import {QueryData} from "../Data/QueryData"
+import {IQueryData, ConsoleQueryData, TelegramQueryData} from "../Data/ConsoleQueryData"
 import {createServer, IncomingMessage, Server, ServerResponse} from "node:http"
 import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
@@ -34,6 +34,7 @@ export class InputOutputHTTPService implements IInputOutputService {
             return
         }
 
+        /*
         try {
             // Парсим URL и извлекаем query-параметры
             const url = new URL(request.url, `http://${request.headers.host}`)
@@ -56,11 +57,11 @@ export class InputOutputHTTPService implements IInputOutputService {
         } catch (error) {
             response.writeHead(500, { 'Content-Type': 'application/json' })
             response.end(JSON.stringify({ error: 'Internal Server Error' }))
-        }
+        }*/
 
     }
 
-    private async processQuery(queryData: QueryData): Promise<ResponseData> {
+    private async processQuery(queryData: ConsoleQueryData): Promise<ResponseData> {
         return {
             data: [`Processed query: ${queryData.text}`]
         }
@@ -83,12 +84,12 @@ export class InputOutputHTTPService implements IInputOutputService {
         })
     }
 
-    async sendResponse(response: ResponseData | null): Promise<void> {
+    async sendResponse(response: ResponseData | null, queryData: IQueryData): Promise<void> {
         if (!response) return
 
         const data = response?.data || []
         for (const text of data) {
-            await this.botProvider.sendResponse(text)
+            await this.botProvider.sendResponse(text, queryData)
         }
     }
 
@@ -98,16 +99,6 @@ export class InputOutputHTTPService implements IInputOutputService {
             if (!queryData.text) return
             await this.commandHandler.handleQuery(queryData)
         }, this.updateInterval)
-    }
-}
-
-class TelegramUpdatePostResponse {
-    updateId: number
-    text: string
-
-    constructor(data: any) {
-        this.updateId = data?.update_id || 0
-        this.text = data?.message?.text || ""
     }
 }
 
