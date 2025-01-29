@@ -39,35 +39,14 @@ export class InputOutputConsoleService implements IInputOutputService {
     async start(): Promise<void> {
 
         while (this.model.isAppRunning()) {
-
-            let responseData: ResponseData | null = null
             const queryData = await this.getQuery()
-
             await this.controller.run(queryData)
-
-            /*
-            let input = queryData.text.toLowerCase().trim()
-
-            // TODO: нужно логику вынести в общий метод для различных сервисов http/console, возможно даже пересмотреть ее
-            // не нравится постоянная отправка currencies в command.execute(currencies) когда не надо
-            const currencies = this.currencyService.parseCurrencyCodes(input)
-            if (currencies) {
-                input = Commands.CURRENCY_RATIO
-            }
-
-            const command = this.commandFactory.createCommand(input)
-
-            responseData = (command)
-                ? await command.execute(currencies)
-                : new ResponseData([this.defaultResponse])
-
-            this.sendResponse(responseData)*/
         }
 
-        this.close()
+        this.stop()
     }
 
-    close(): void {
+    stop(): void {
         this.readlineService.close()
     }
 

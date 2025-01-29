@@ -16,6 +16,7 @@ export class InputOutputHTTPService implements IInputOutputService {
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
     private controller: LogicController
+    private updateInterval: number = 5000
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.botProvider = botProvider
@@ -74,31 +75,31 @@ export class InputOutputHTTPService implements IInputOutputService {
             Logger.log("Сервер запущен.")
         })
 
-        // TODO: вынести в метод
-        setInterval(async () => {
-
-            const queryData = await this.botProvider.getUpdates()
-            if (!queryData.text) return
-
-            await this.controller.run(queryData)
-
-        }, 5000)
+        this.getBotUpdates()
     }
 
-    close(): void {
+    stop(): void {
         this.server.close(() => {
             Logger.log("Сервер остановлен.")
         })
     }
 
     async sendResponse(response: ResponseData | null): Promise<void> {
-        if (!response)
-            return
+        if (!response) return
 
         const data = response?.data || []
         for (const text of data) {
             await this.botProvider.sendResponse(text)
         }
+    }
+
+    private getBotUpdates() {
+        setInterval(async () => {
+            const queryData = await this.botProvider.getUpdates()
+            if (!queryData.text) return
+
+            await this.controller.run(queryData)
+        }, this.updateInterval)
     }
 }
 
