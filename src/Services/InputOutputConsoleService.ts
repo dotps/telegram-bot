@@ -11,16 +11,11 @@ import {LogicController} from "../LogicController"
 export class InputOutputConsoleService implements IInputOutputService {
 
     private readlineService: Interface
-    private commandFactory: ICommandFactory
-    private currencyService: ICurrencyService
     private model: IModel
     private beforeCursorText: string = "> "
-    // private defaultResponse: string = "Неизвестная команда."
     private controller: LogicController
 
     constructor(model:IModel, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
-        this.commandFactory = commandFactory
-        this.currencyService = currencyService
         this.model = model
         this.controller = new LogicController(this, commandFactory, currencyService)
         this.readlineService = createInterface({
