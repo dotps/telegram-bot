@@ -9,7 +9,7 @@ import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {Logger} from "./Utils/Logger"
 import {QueryData} from "./Data/QueryData"
 
-export class LogicController {
+export class CommandHandler {
 
     private readonly inputOutputService: IInputOutputService
     private commandFactory: ICommandFactory
@@ -22,18 +22,16 @@ export class LogicController {
         this.inputOutputService = inputOutputService
     }
 
-    async run(queryData: QueryData) {
+    async handleQuery(queryData: QueryData) {
 
-        let responseData: ResponseData | null = null
+        let responseData: ResponseData | null
         let input = queryData.text.toLowerCase().trim()
 
-        // TODO: не нравится постоянная отправка currencies в command.execute(currencies) когда не надо
         const currencies = this.currencyService.parseCurrencyCodes(input)
-        if (currencies) {
-            input = Commands.CURRENCY_RATIO
-        }
+        if (currencies) input = Commands.CURRENCY_RATIO
 
-        const command = this.commandFactory.createCommand(input)
+        const commandData = new CommandData(input, {currencies: currencies})
+        const command = this.commandFactory.createCommand(commandData)
 
         responseData = (command)
             ? await command.execute(currencies)
@@ -42,4 +40,18 @@ export class LogicController {
         await this.inputOutputService.sendResponse(responseData)
     }
 
+}
+
+export class CommandData {
+    input: string
+    params: ICommandDataParams
+
+    constructor(input: string, params: ICommandDataParams) {
+        this.input = input
+        this.params = params
+    }
+}
+
+export interface ICommandDataParams {
+    currencies: string[] | null
 }

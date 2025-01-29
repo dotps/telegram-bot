@@ -6,7 +6,7 @@ import {Logger} from "../Utils/Logger"
 import {IBotProvider} from "./Bots/IBotProvider"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
-import {LogicController} from "../LogicController"
+import {CommandHandler} from "../CommandHandler"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
@@ -14,13 +14,13 @@ export class InputOutputHTTPService implements IInputOutputService {
     private botProvider: IBotProvider
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
-    private controller: LogicController
+    private commandHandler: CommandHandler
     private updateInterval: number = 5000
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.botProvider = botProvider
         this.server = createServer(this.handleGetRequest.bind(this))
-        this.controller = new LogicController(this, commandFactory, currencyService)
+        this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
     }
 
     private async handleGetRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -96,8 +96,7 @@ export class InputOutputHTTPService implements IInputOutputService {
         setInterval(async () => {
             const queryData = await this.botProvider.getUpdates()
             if (!queryData.text) return
-
-            await this.controller.run(queryData)
+            await this.commandHandler.handleQuery(queryData)
         }, this.updateInterval)
     }
 }

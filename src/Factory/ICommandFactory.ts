@@ -1,5 +1,6 @@
 import {ICommand} from "../Commands/ICommand"
+import {CommandData} from "../CommandHandler"
 
 export interface ICommandFactory {
-    createCommand(command: string): ICommand | null
+    createCommand(commandData: CommandData): ICommand | null
 }

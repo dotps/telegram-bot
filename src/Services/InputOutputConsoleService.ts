@@ -6,18 +6,18 @@ import {IModel} from "../Model/IModel"
 import {Commands} from "../Commands/Commands"
 import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
-import {LogicController} from "../LogicController"
+import {CommandHandler} from "../CommandHandler"
 
 export class InputOutputConsoleService implements IInputOutputService {
 
-    private readlineService: Interface
-    private model: IModel
+    private readonly readlineService: Interface
+    private readonly model: IModel
+    private readonly commandHandler: CommandHandler
     private beforeCursorText: string = "> "
-    private controller: LogicController
 
     constructor(model:IModel, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.model = model
-        this.controller = new LogicController(this, commandFactory, currencyService)
+        this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
         this.readlineService = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -35,7 +35,7 @@ export class InputOutputConsoleService implements IInputOutputService {
 
         while (this.model.isAppRunning()) {
             const queryData = await this.getQuery()
-            await this.controller.run(queryData)
+            await this.commandHandler.handleQuery(queryData)
         }
 
         this.stop()

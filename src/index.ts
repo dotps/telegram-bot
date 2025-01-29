@@ -29,11 +29,4 @@ const inputOutputService: IInputOutputService = (isUseHttpServer)
     ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
     : new InputOutputConsoleService(model, currencyService, commandFactory)
 
-// const app = new Controller(model, inputOutputService, commandFactory, currencyService, botProvider)
-// app.run()
-
 inputOutputService.start()
-
-// (async () => {
-//
-// })()
