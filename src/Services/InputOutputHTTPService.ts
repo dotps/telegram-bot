@@ -12,7 +12,6 @@ export class InputOutputHTTPService implements IInputOutputService {
 
     private readonly port: number = 3000
     private readonly queryMethod: string = "/query"
-    private readonly isUseWebhook = true
     private readonly server: Server
     private readonly botProvider: IBotProvider
     private readonly commandHandler: CommandHandler
@@ -34,18 +33,11 @@ export class InputOutputHTTPService implements IInputOutputService {
         }
 
         try {
-
             let body = ''
-
-            request.on('data', chunk => {
-                body += chunk.toString()
-            })
-
+            request.on('data', chunk => body += chunk.toString())
             request.on('end', async () => {
-
                 response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
                 response.end()
-
                 const requestData = [JSON.parse(body)]
                 const queryData = await this.botProvider.handleUpdate(requestData)
                 await this.commandHandler.handleQuery(queryData)
@@ -62,10 +54,8 @@ export class InputOutputHTTPService implements IInputOutputService {
 
         await this.botProvider.init()
 
-        if (this.isUseWebhook) {
-            this.server.listen(this.port, () => {
-                Logger.log("Сервер запущен.")
-            })
+        if (this.botProvider.isUseWebhook()) {
+            this.server.listen(this.port, () => Logger.log("Сервер запущен."))
         }
         else {
             this.getBotUpdates()
@@ -73,9 +63,7 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     stop(): void {
-        this.server.close(() => {
-            Logger.log("Сервер остановлен.")
-        })
+        this.server.close(() => Logger.log("Сервер остановлен."))
     }
 
     async sendResponse(response: ResponseData | null, queryData: IQueryData): Promise<void> {
@@ -88,13 +76,11 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     private getBotUpdates() {
-
         setInterval(async () => {
             const queryData = await this.botProvider.getUpdates()
             if (!queryData.text) return
             await this.commandHandler.handleQuery(queryData)
         }, this.updateInterval)
-
     }
 }
 

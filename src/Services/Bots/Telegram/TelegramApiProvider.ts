@@ -7,13 +7,15 @@ import {TelegramBaseResponse} from "../../../Data/Telegram/TelegramBaseResponse"
 import {TelegramGetUpdatesResponse} from "../../../Data/Telegram/TelegramGetUpdatesResponse"
 import {TelegramQueryData} from "../../../Data/Telegram/TelegramQueryData"
 import {IQueryData} from "../../../Data/IQueryData"
+import {TelegramConfig} from "./TelegramConfig"
 
 export class TelegramApiProvider implements IBotProvider {
 
     private readonly apiUrl: string = "https://api.telegram.org/bot"
-    private readonly token: string = "7727862535:AAGq0VKfRaOeXCPB5v1R02ct8IydXDslt-c"
+    private readonly token: string = TelegramConfig.token
     private readonly baseUrl: string = this.apiUrl + this.token + "/"
     private readonly webRequestService: IWebRequestService
+    private readonly canUseWebhook = TelegramConfig.canUseWebhook
     private model: IModel
     private lastUpdateId: number = 0
     private errorMessage: string = "Telegram не ok: "
@@ -81,6 +83,10 @@ export class TelegramApiProvider implements IBotProvider {
         }
 
         return queryData
+    }
+
+    isUseWebhook(): boolean {
+        return this.canUseWebhook
     }
 }
 
