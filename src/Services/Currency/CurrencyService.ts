@@ -18,8 +18,8 @@ export class CurrencyService implements ICurrencyService {
     }
 
     parseCurrencyCodes(input: string): string[] | null {
-        const pattern = /^[A-Za-z]{3}-[A-Za-z]{3}$/;
-        return pattern.test(input) ? input.toUpperCase().split('-') : null
+        const pattern = /^[A-Za-z]{3}-[A-Za-z]{3}$/
+        return pattern.test(input) ? input.toUpperCase().split("-") : null
     }
 }
 

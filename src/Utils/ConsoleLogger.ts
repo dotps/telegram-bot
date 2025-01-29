@@ -1,4 +1,4 @@
-import {ILoggerService} from "./ILoggerService";
+import {ILoggerService} from "./ILoggerService"
 
 export class ConsoleLogger implements ILoggerService {
 

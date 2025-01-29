@@ -1,7 +1,7 @@
 import {ILoggerService} from "./ILoggerService"
 
 export class Logger {
-    private static loggerService: ILoggerService;
+    private static loggerService: ILoggerService
     static isEnabled: boolean
 
     public static init(loggerService: ILoggerService): void {

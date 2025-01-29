@@ -33,9 +33,9 @@ export class InputOutputHTTPService implements IInputOutputService {
         }
 
         try {
-            let body = ''
-            request.on('data', chunk => body += chunk.toString())
-            request.on('end', async () => {
+            let body = ""
+            request.on("data", chunk => body += chunk.toString())
+            request.on("end", async () => {
                 response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
                 response.end()
                 const requestData = [JSON.parse(body)]
