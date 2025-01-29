@@ -52,10 +52,14 @@ export class TelegramApiProvider implements IBotProvider {
     async getUpdates(): Promise<QueryData> {
         const offset = (this.lastUpdateId) ? `offset=${this.lastUpdateId + 1}&` : ``
         const botResponse = await this.webRequestService.tryGet(`${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`)
+
+
+        console.log(botResponse.result[0].message)
+        // TODO: chat_id брать из сообщения botResponse.result[0].message.chat.id
+
         let queryData: QueryData = {
             text: ""
         }
-        console.log(botResponse?.ok)
         if (botResponse?.ok) {
             const updatesResponse = new TelegramGetUpdatesResponse(botResponse?.result)
             if (updatesResponse) {
@@ -67,13 +71,6 @@ export class TelegramApiProvider implements IBotProvider {
                     }
                 }
             }
-            // console.log(updatesResponse)
-            // console.log(updatesResponse.getLastUpdateId())
-        }
-
-        if (queryData.text) {
-            // TODO: подключить метод парсинга команды и запуска команд
-            console.log(queryData)
         }
 
         return queryData
