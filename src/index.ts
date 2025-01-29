@@ -2,7 +2,7 @@ import {InputOutputConsoleService} from "./Services/InputOutputConsoleService"
 import {CommandFactory} from "./Factory/CommandFactory"
 import {Model} from "./Model/Model"
 import {CurrencyService} from "./Services/Currency/CurrencyService"
-import {CurrencyProviderExchangeRatesApi} from "./Services/Currency/CurrencyProviderExchangeRatesApi"
+import {ExchangeRatesApiCurrencyProvider} from "./Services/Currency/ExchangeRatesApiCurrencyProvider"
 import {ConsoleLogger} from "./Utils/ConsoleLogger"
 import {Logger} from "./Utils/Logger"
 import {WebRequestFetchService} from "./Services/WebRequestFetchService"
@@ -20,7 +20,7 @@ Logger.init(new ConsoleLogger(true))
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
 const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
-const currencyProvider: ICurrencyProvider = new CurrencyProviderExchangeRatesApi(webRequestService)
+const currencyProvider: ICurrencyProvider = new ExchangeRatesApiCurrencyProvider(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 

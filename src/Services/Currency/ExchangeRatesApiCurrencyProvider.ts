@@ -2,7 +2,7 @@ import {ICurrencyProvider} from "./ICurrencyProvider"
 import {IWebRequestService} from "../IWebRequestService"
 import {CurrencyRatio} from "./CurrencyRatio"
 
-export class CurrencyProviderExchangeRatesApi implements ICurrencyProvider {
+export class ExchangeRatesApiCurrencyProvider implements ICurrencyProvider {
 
     private readonly apiUrl: string = "https://api.exchangeratesapi.io/v1/latest"
     private readonly apiKey: string = "e4bc5f02eb4d7bd6ade74a71ade2089c"
