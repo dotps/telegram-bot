@@ -14,13 +14,15 @@ import {ICommandFactory} from "./Factory/ICommandFactory"
 import {IBotProvider} from "./Services/Bots/IBotProvider"
 import {TelegramApiProvider} from "./Services/Bots/Telegram/TelegramApiProvider"
 import {InputOutputHTTPService} from "./Services/InputOutputHTTPService"
+import {FreeCurrencyApiCurrencyProvider} from "./Services/Currency/FreeCurrencyApiCurrencyProvider"
 
 Logger.init(new ConsoleLogger(true))
 
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
 const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
-const currencyProvider: ICurrencyProvider = new ExchangeRatesApiCurrencyProvider(webRequestService)
+// const currencyProvider: ICurrencyProvider = new Exusd-changeRatesApiCurrencyProvider(webRequestService)
+const currencyProvider: ICurrencyProvider = new FreeCurrencyApiCurrencyProvider(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 
