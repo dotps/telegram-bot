@@ -5,6 +5,10 @@ import {CommandFactory} from "../src/Factory/CommandFactory"
 import {Model} from "../src/Model/Model"
 import {CurrencyService} from "../src/Services/Currency/CurrencyService"
 import {ICurrencyProvider} from "../src/Services/Currency/ICurrencyProvider"
+import {FreeCurrencyApiCurrencyProvider} from "../src/Services/Currency/FreeCurrencyApiCurrencyProvider"
+import {ICurrencyService} from "../src/Services/Currency/ICurrencyService"
+import {ICommandFactory} from "../src/Factory/ICommandFactory"
+import {IWebRequestService} from "../src/Services/IWebRequestService"
 
 jest.mock("../src/Utils/Logger", () => ({
     Logger: {
@@ -15,10 +19,11 @@ jest.mock("../src/Utils/Logger", () => ({
 
 describe("CommandHandler", () => {
     let mockInputOutputService: jest.Mocked<IInputOutputService>
-    let mockCurrencyProvider: jest.Mocked<ICurrencyProvider>
-    let currencyService: CurrencyService
+    let mockWebRequestService: jest.Mocked<IWebRequestService>
+    let currencyProvider: ICurrencyProvider
+    let currencyService: ICurrencyService
     let commandHandler: CommandHandler
-    let commandFactory: CommandFactory
+    let commandFactory: ICommandFactory
     let model: Model
 
     beforeEach(() => {
@@ -27,24 +32,44 @@ describe("CommandHandler", () => {
             start: jest.fn(),
             stop: jest.fn()
         }
-        mockCurrencyProvider = {
-            getCurrencyRatio: jest.fn().mockImplementation((currencies: string[]) => {
-                const [first, second] = currencies
-                const rates: { [key: string]: number } = {
-                    "USD": 1.0,
-                    "EUR": 0.85,
-                    "GBP": 0.75
+        // mockCurrencyProvider = {
+        //     getCurrencyRatio: jest.fn().mockImplementation((currencies: string[]) => {
+        //         const [first, second] = currencies
+        //         const rates: { [key: string]: number } = {
+        //             "USD": 1.0,
+        //             "EUR": 0.85,
+        //             "GBP": 0.75
+        //         }
+        //         const ratio = rates[second] / rates[first]
+        //         return Promise.resolve({
+        //             firstCurrency: first,
+        //             secondCurrency: second,
+        //             ratio: ratio
+        //         })
+        //     }),
+        //     getCurrencySymbols: jest.fn().mockResolvedValue(["USD", "EUR", "GBP"])
+        // }
+
+        mockWebRequestService = {
+            tryGet: jest.fn().mockResolvedValue({
+                data: {
+                    USD: 1.0,
+                    EUR: 0.85,
+                    GBP: 0.75
                 }
-                const ratio = rates[second] / rates[first]
-                return Promise.resolve({
-                    firstCurrency: first,
-                    secondCurrency: second,
-                    ratio: ratio
-                })
-            }),
-            getCurrencySymbols: jest.fn().mockResolvedValue(["USD", "EUR", "GBP"])
+            })
         }
-        currencyService = new CurrencyService(mockCurrencyProvider)
+
+        currencyProvider = new FreeCurrencyApiCurrencyProvider(mockWebRequestService)
+        currencyService = new CurrencyService(currencyProvider)
+        model = new Model()
+        commandFactory = new CommandFactory(model, currencyService)
+        commandHandler = new CommandHandler(
+            mockInputOutputService,
+            commandFactory,
+            currencyService
+        )
+
         model = new Model()
         commandFactory = new CommandFactory(model, currencyService)
         commandHandler = new CommandHandler(
