@@ -27,7 +27,8 @@ export class WebRequestFetchService implements IWebRequestService {
             clearTimeout(timeoutId)
             if (error instanceof Error && error.name === "AbortError") {
                 Logger.error(`Timeout after ${timeout}ms`)
-                throw new Error("Timeout")
+                return null
+                // throw new Error("Timeout")
             }
             Logger.error(`${error}`)
             return null

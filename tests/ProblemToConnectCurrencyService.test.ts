@@ -10,6 +10,7 @@ import {ICurrencyService} from "../src/Services/Currency/ICurrencyService"
 import {ICommandFactory} from "../src/Factory/ICommandFactory"
 import {IWebRequestService} from "../src/Services/IWebRequestService"
 import {ResponseData} from "../src/Data/ResponseData"
+import { WebRequestFetchService } from "../src/Services/WebRequestFetchService"
 
 jest.mock("../src/Utils/Logger", () => ({
     Logger: {
@@ -64,13 +65,15 @@ describe("Тестирование связи с внешними сервиса
         // TODO: продолжить имитацию таймаута (+ протестировать новый fetch)
 
         it("Имитируем таймаут", async () => {
-            mockWebRequestService.tryGet.mockRejectedValue(new Error("Timeout"))
+            // Имитируем таймаут через возврат null
+            mockWebRequestService.tryGet.mockResolvedValue(null);
 
-            await commandHandler.handleQuery(createQueryData("USD-EUR"))
+            await commandHandler.handleQuery(createQueryData("USD-EUR"));
 
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData
-            expect(response.data[0]).toBe(expectedError)
-        })
+            // Проверяем, что был отправлен ответ об ошибке
+            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData;
+            expect(response.data[0]).toBe(expectedError);
+        });
 
         /*
         it("Имитируем ошибку 500", async () => {
