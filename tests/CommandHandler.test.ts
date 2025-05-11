@@ -32,23 +32,6 @@ describe("CommandHandler", () => {
             start: jest.fn(),
             stop: jest.fn()
         }
-        // mockCurrencyProvider = {
-        //     getCurrencyRatio: jest.fn().mockImplementation((currencies: string[]) => {
-        //         const [first, second] = currencies
-        //         const rates: { [key: string]: number } = {
-        //             "USD": 1.0,
-        //             "EUR": 0.85,
-        //             "GBP": 0.75
-        //         }
-        //         const ratio = rates[second] / rates[first]
-        //         return Promise.resolve({
-        //             firstCurrency: first,
-        //             secondCurrency: second,
-        //             ratio: ratio
-        //         })
-        //     }),
-        //     getCurrencySymbols: jest.fn().mockResolvedValue(["USD", "EUR", "GBP"])
-        // }
 
         mockWebRequestService = {
             tryGet: jest.fn().mockResolvedValue({
