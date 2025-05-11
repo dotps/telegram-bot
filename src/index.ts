@@ -24,7 +24,7 @@ const currencyProvider: ICurrencyProvider = new ExchangeRatesApiCurrencyProvider
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 
-const isUseHttpServer = true
+const isUseHttpServer = false
 const inputOutputService: IInputOutputService = (isUseHttpServer)
     ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
     : new InputOutputConsoleService(model, currencyService, commandFactory)
