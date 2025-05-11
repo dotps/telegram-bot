@@ -53,13 +53,6 @@ describe("CommandHandler", () => {
             currencyService
         )
 
-        model = new Model()
-        commandFactory = new CommandFactory(model, currencyService)
-        commandHandler = new CommandHandler(
-            mockInputOutputService,
-            commandFactory,
-            currencyService
-        )
         jest.clearAllMocks()
     })
 
