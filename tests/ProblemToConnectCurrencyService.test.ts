@@ -10,7 +10,7 @@ import {ICurrencyService} from "../src/Services/Currency/ICurrencyService"
 import {ICommandFactory} from "../src/Factory/ICommandFactory"
 import {IWebRequestService} from "../src/Services/IWebRequestService"
 import {ResponseData} from "../src/Data/ResponseData"
-import { WebRequestFetchService } from "../src/Services/WebRequestFetchService"
+import {WebRequestFetchService} from "../src/Services/WebRequestFetchService"
 
 jest.mock("../src/Utils/Logger", () => ({
     Logger: {
@@ -29,8 +29,6 @@ describe("Тестирование связи с внешними сервиса
     let model: Model
 
     beforeEach(() => {
-        jest.useFakeTimers()
-
         mockInputOutputService = {
             sendResponse: jest.fn(),
             start: jest.fn(),
@@ -54,64 +52,33 @@ describe("Тестирование связи с внешними сервиса
         jest.clearAllMocks()
     })
 
-    afterEach(() => {
-        jest.useRealTimers()
-    })
-
     describe("Проблемы связи сервисом курса валют", () => {
-        const createQueryData = (text: string): IQueryData => ({text})
-        const expectedError = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
+        it("должен вернуть ошибку при таймауте запроса к API", async () => {
 
-        // TODO: продолжить имитацию таймаута (+ протестировать новый fetch)
+            // TODO: продолжить имитацию таймаута (тест проходит, но просто через имитацию, попробовать сделать обращение к несуществующему адресу)
 
-        it("Имитируем таймаут", async () => {
-            // Имитируем таймаут через возврат null
-            mockWebRequestService.tryGet.mockResolvedValue(null);
+            // Настраиваем мок так, чтобы он возвращал null при таймауте
+            mockWebRequestService.tryGet.mockImplementation(async () => {
+                await new Promise(resolve => setTimeout(resolve, 100)); // Имитируем задержку
+                return null; // Возвращаем null как при таймауте
+            });
 
-            await commandHandler.handleQuery(createQueryData("USD-EUR"));
+            // Имитируем команду /currency USD-EUR
+            const queryData: IQueryData = {
+                text: "USD-EUR"
+            }
 
-            // Проверяем, что был отправлен ответ об ошибке
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData;
-            expect(response.data[0]).toBe(expectedError);
-        });
+            // Запускаем обработку команды
+            await commandHandler.handleQuery(queryData)
 
-        /*
-        it("Имитируем ошибку 500", async () => {
-            mockWebRequestService.tryGet.mockRejectedValue(new Error("Internal Server Error"))
-
-            await commandHandler.handleQuery(createQueryData("USD-EUR"))
-
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData
-            expect(response.data[0]).toBe(expectedError)
-        })
-
-        it("Имитируем сетевую ошибку", async () => {
-            mockWebRequestService.tryGet.mockRejectedValue(new Error("Network Error"))
-
-            await commandHandler.handleQuery(createQueryData("USD-EUR"))
-
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData
-            expect(response.data[0]).toBe(expectedError)
-        })
-
-        it("Имитируем неверный формат ответа", async () => {
-            mockWebRequestService.tryGet.mockResolvedValue({
-                data: "invalid data format"
-            })
-
-            await commandHandler.handleQuery(createQueryData("USD-EUR"))
-
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData
-            expect(response.data[0]).toBe(expectedError)
-        })
-
-        it("Имитируем превышение лимита запросов", async () => {
-            mockWebRequestService.tryGet.mockRejectedValue(new Error("Rate limit exceeded"))
-
-            await commandHandler.handleQuery(createQueryData("USD-EUR"))
-
-            const response = mockInputOutputService.sendResponse.mock.calls[0][0] as ResponseData
-            expect(response.data[0]).toBe(expectedError)
-        })*/
+            // Проверяем, что пользователь получил сообщение об ошибке
+            expect(mockInputOutputService.sendResponse).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: ["Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."]
+                }),
+                queryData
+            )
+        }, 10000) // Увеличиваем таймаут теста до 10 секунд
     })
+
 })
