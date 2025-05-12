@@ -9,6 +9,7 @@ import {FreeCurrencyApiCurrencyProvider} from "../src/Services/Currency/FreeCurr
 import {ICurrencyService} from "../src/Services/Currency/ICurrencyService"
 import {ICommandFactory} from "../src/Factory/ICommandFactory"
 import {IWebRequestService} from "../src/Services/IWebRequestService"
+import {createQueryData} from "./testMethods"
 
 jest.mock("../src/Utils/Logger", () => ({
     Logger: {
@@ -57,7 +58,6 @@ describe("CommandHandler", () => {
     })
 
     describe("handleQuery", () => {
-        const createQueryData = (text: string): IQueryData => ({text})
         const commands = [
             "/start",
             "/Start",

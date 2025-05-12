@@ -11,6 +11,23 @@ import {ICommandFactory} from "../src/Factory/ICommandFactory"
 import {IWebRequestService} from "../src/Services/IWebRequestService"
 import {ResponseData} from "../src/Data/ResponseData"
 import {WebRequestFetchService} from "../src/Services/WebRequestFetchService"
+import {createQueryData} from "./testMethods"
+
+// Класс с несуществующим URL для тестирования ошибок
+class BadCurrencyProvider extends FreeCurrencyApiCurrencyProvider {
+    constructor(webRequestService: IWebRequestService) {
+        super(webRequestService)
+        // @ts-ignore
+        this.apiUrl = "https://non-existent-api.example.com/v1/latest"
+        // @ts-ignore
+        this.baseUrl = this.apiUrl + "?apikey=test"
+    }
+
+    getApiUrl() {
+        // @ts-ignore
+        return this.apiUrl
+    }
+}
 
 jest.mock("../src/Utils/Logger", () => ({
     Logger: {
@@ -19,6 +36,7 @@ jest.mock("../src/Utils/Logger", () => ({
     }
 }))
 
+const badResponse = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
 describe("Тестирование связи с внешними сервисами", () => {
     let mockInputOutputService: jest.Mocked<IInputOutputService>
     let mockWebRequestService: jest.Mocked<IWebRequestService>
@@ -29,56 +47,47 @@ describe("Тестирование связи с внешними сервиса
     let model: Model
 
     beforeEach(() => {
+        model = new Model()
+
         mockInputOutputService = {
             sendResponse: jest.fn(),
             start: jest.fn(),
             stop: jest.fn()
         }
 
-        mockWebRequestService = {
-            tryGet: jest.fn()
-        }
-
-        currencyProvider = new FreeCurrencyApiCurrencyProvider(mockWebRequestService)
-        currencyService = new CurrencyService(currencyProvider)
-        model = new Model()
-        commandFactory = new CommandFactory(model, currencyService)
-        commandHandler = new CommandHandler(
-            mockInputOutputService,
-            commandFactory,
-            currencyService
-        )
-
         jest.clearAllMocks()
     })
 
     describe("Проблемы связи сервисом курса валют", () => {
-        it("должен вернуть ошибку при таймауте запроса к API", async () => {
+        it("Должен вернуть ошибку при обращении к несуществующему адресу", async () => {
+            const webRequestFetchService = new WebRequestFetchService()
+            const currencyProvider = new BadCurrencyProvider(webRequestFetchService)
+            const currencyService = new CurrencyService(currencyProvider)
+            const commandFactory = new CommandFactory(model, currencyService)
+            const commandHandler = new CommandHandler(
+                mockInputOutputService,
+                commandFactory,
+                currencyService
+            )
 
-            // TODO: продолжить имитацию таймаута (тест проходит, но просто через имитацию, попробовать сделать обращение к несуществующему адресу)
+            const input = "USD-EUR"
+            const queryData: IQueryData = createQueryData(input)
 
-            // Настраиваем мок так, чтобы он возвращал null при таймауте
-            mockWebRequestService.tryGet.mockImplementation(async () => {
-                await new Promise(resolve => setTimeout(resolve, 100)); // Имитируем задержку
-                return null; // Возвращаем null как при таймауте
-            });
+            console.log(`\nТест: Обработка команды "${input}"`)
+            console.log(`\nURL: "${currencyProvider.getApiUrl()}"`)
 
-            // Имитируем команду /currency USD-EUR
-            const queryData: IQueryData = {
-                text: "USD-EUR"
-            }
-
-            // Запускаем обработку команды
             await commandHandler.handleQuery(queryData)
 
-            // Проверяем, что пользователь получил сообщение об ошибке
-            expect(mockInputOutputService.sendResponse).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    data: ["Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."]
-                }),
-                queryData
-            )
-        }, 10000) // Увеличиваем таймаут теста до 10 секунд
-    })
+            const response = mockInputOutputService.sendResponse.mock.calls[0]
+            console.log(response)
+            expect(response[0]?.data[0]).toBe(badResponse)
 
+            // expect(mockInputOutputService.sendResponse).toHaveBeenCalledWith(
+            //     expect.objectContaining({
+            //         data: [badResponse]
+            //     }),
+            //     queryData
+            // )
+        }, 10000)
+    })
 })
