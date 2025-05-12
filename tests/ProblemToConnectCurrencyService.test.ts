@@ -14,27 +14,7 @@ import {WebRequestFetchService} from "../src/Services/WebRequestFetchService"
 import {createQueryData} from "./testMethods"
 
 // Класс с несуществующим URL для тестирования ошибок
-class BadCurrencyProvider extends FreeCurrencyApiCurrencyProvider {
-    constructor(webRequestService: IWebRequestService) {
-        super(webRequestService)
-        // @ts-ignore
-        this.apiUrl = "https://non-existent-api.example.com/v1/latest"
-        // @ts-ignore
-        this.baseUrl = this.apiUrl + "?apikey=test"
-    }
 
-    getApiUrl() {
-        // @ts-ignore
-        return this.apiUrl
-    }
-}
-
-jest.mock("../src/Utils/Logger", () => ({
-    Logger: {
-        error: jest.fn(),
-        log: jest.fn()
-    }
-}))
 
 const badResponse = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
 describe("Тестирование связи с внешними сервисами", () => {
@@ -72,7 +52,6 @@ describe("Тестирование связи с внешними сервиса
 
             const input = "USD-EUR"
             const queryData: IQueryData = createQueryData(input)
-
             console.log(`\nТест: Обработка команды "${input}"`)
             console.log(`\nURL: "${currencyProvider.getApiUrl()}"`)
 
@@ -81,13 +60,55 @@ describe("Тестирование связи с внешними сервиса
             const response = mockInputOutputService.sendResponse.mock.calls[0]
             console.log(response)
             expect(response[0]?.data[0]).toBe(badResponse)
+        }, 10000)
 
-            // expect(mockInputOutputService.sendResponse).toHaveBeenCalledWith(
-            //     expect.objectContaining({
-            //         data: [badResponse]
-            //     }),
-            //     queryData
-            // )
+        it("Должен вернуть ошибку при неуспешном ответе от сервера", async () => {
+            // TODO: продолжить
+            const webRequestFetchService = new WebRequestFetchService()
+            // const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/200?sleep=15000")
+            const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/404")
+            const currencyService = new CurrencyService(currencyProvider)
+            const commandFactory = new CommandFactory(model, currencyService)
+            const commandHandler = new CommandHandler(
+                mockInputOutputService,
+                commandFactory,
+                currencyService
+            )
+
+            const input = "USD-EUR"
+            const queryData: IQueryData = createQueryData(input)
+            console.log(`\nТест: Обработка команды "${input}" с ошибкой 404`)
+            console.log(`\nURL: "${currencyProvider.getApiUrl()}"`)
+
+            await commandHandler.handleQuery(queryData)
+
+            const response = mockInputOutputService.sendResponse.mock.calls[0]
+            console.log(response)
+            expect(response[0]?.data[0]).toBe(badResponse)
         }, 10000)
     })
 })
+
+class BadCurrencyProvider extends FreeCurrencyApiCurrencyProvider {
+    constructor(webRequestService: IWebRequestService, url: string = "https://non-existent-api.example.com/v1/latest") {
+        super(webRequestService)
+
+        // this.apiUrl = url
+        // @ts-ignore
+        this.apiUrl = "https://non-existent-api.example.com/v1/latest"
+        // @ts-ignore
+        this.apiKey = "text"
+    }
+
+    getApiUrl() {
+        // @ts-ignore
+        return this.apiUrl
+    }
+}
+
+jest.mock("../src/Utils/Logger", () => ({
+    Logger: {
+        error: jest.fn(),
+        log: jest.fn()
+    }
+}))
