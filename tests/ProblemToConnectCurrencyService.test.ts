@@ -12,11 +12,10 @@ import {IWebRequestService} from "../src/Services/IWebRequestService"
 import {ResponseData} from "../src/Data/ResponseData"
 import {WebRequestFetchService} from "../src/Services/WebRequestFetchService"
 import {createQueryData} from "./testMethods"
-
-// Класс с несуществующим URL для тестирования ошибок
-
+import {CurrencyRatioCommand} from "../src/Commands/CurrencyRatioCommand"
 
 const badResponse = "Ой! Что-то пошло не так. Убедись, что ввел валютную пару в формате USD-EUR, или попробуй позже."
+
 describe("Тестирование связи с внешними сервисами", () => {
     let mockInputOutputService: jest.Mocked<IInputOutputService>
     let mockWebRequestService: jest.Mocked<IWebRequestService>
@@ -86,10 +85,31 @@ describe("Тестирование связи с внешними сервиса
             expect(response[0]?.data[0]).toBe(badResponse)
         }, 10000)
 
-        it("Должен вернуть ошибку при неуспешном ответе от сервера", async () => {
-            // TODO: продолжить
+        it("Должен вернуть ошибку при не валидном ответе от сервера", async () => {
             const webRequestFetchService = new WebRequestFetchService()
-            // const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/200?sleep=15000")
+            const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/200")
+            const currencyService = new CurrencyService(currencyProvider)
+            const commandFactory = new CommandFactory(model, currencyService)
+            const commandHandler = new CommandHandler(
+                mockInputOutputService,
+                commandFactory,
+                currencyService
+            )
+
+            const input = "USD-EUR"
+            const queryData: IQueryData = createQueryData(input)
+            console.log(`\nТест: Обработка команды "${input}" с невалидным ответом`)
+            console.log(`\nURL: "${currencyProvider.getApiUrl()}"`)
+
+            await commandHandler.handleQuery(queryData)
+
+            const response = mockInputOutputService.sendResponse.mock.calls[0]
+            console.log(response)
+            expect(response[0]?.data[0]).toBe(badResponse)
+        }, 10000)
+
+        it("Должен вернуть ошибку при 404 ответе от сервера", async () => {
+            const webRequestFetchService = new WebRequestFetchService()
             const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/404")
             const currencyService = new CurrencyService(currencyProvider)
             const commandFactory = new CommandFactory(model, currencyService)
@@ -111,8 +131,30 @@ describe("Тестирование связи с внешними сервиса
             expect(response[0]?.data[0]).toBe(badResponse)
         }, 10000)
 
+        it("Должен вернуть ошибку при 500 ответе от сервера", async () => {
+            const webRequestFetchService = new WebRequestFetchService()
+            const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/500")
+            const currencyService = new CurrencyService(currencyProvider)
+            const commandFactory = new CommandFactory(model, currencyService)
+            const commandHandler = new CommandHandler(
+                mockInputOutputService,
+                commandFactory,
+                currencyService
+            )
+
+            const input = "USD-EUR"
+            const queryData: IQueryData = createQueryData(input)
+            console.log(`\nТест: Обработка команды "${input}" с ошибкой 500`)
+            console.log(`\nURL: "${currencyProvider.getApiUrl()}"`)
+
+            await commandHandler.handleQuery(queryData)
+
+            const response = mockInputOutputService.sendResponse.mock.calls[0]
+            console.log(response)
+            expect(response[0]?.data[0]).toBe(badResponse)
+        }, 10000)
+
         it("Должен вернуть ошибку при таймауте", async () => {
-            // TODO: продолжить
             const webRequestFetchService = new WebRequestFetchService()
             const currencyProvider = new BadCurrencyProvider(webRequestFetchService, "https://httpstat.us/200?sleep=15000")
             const currencyService = new CurrencyService(currencyProvider)
@@ -138,12 +180,12 @@ describe("Тестирование связи с внешними сервиса
 })
 
 class BadCurrencyProvider extends FreeCurrencyApiCurrencyProvider {
-    constructor(webRequestService: IWebRequestService, url: string = "https://non-existent-api.example.com/v1/latest") {
+    constructor(webRequestService: IWebRequestService, url: string = "https://non-exist-api.example.com/v1/latest") {
         super(webRequestService)
         // @ts-ignore
         this.apiUrl = url
         // @ts-ignore
-        this.baseUrl = this.apiUrl + "?apikey=test"
+        this.baseUrl = this.apiUrl
     }
 
     getApiUrl() {
