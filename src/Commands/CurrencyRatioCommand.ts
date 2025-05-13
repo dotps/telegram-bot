@@ -19,12 +19,11 @@ export class CurrencyRatioCommand implements ICommand {
 
         const currencyRatio = await this.currencyService.getCurrencyRatio(this.currencies)
         if (!currencyRatio) {
-            Logger.error(this.constructor.name + ", currencyRatio is null" + this.responseError)
+            Logger.error(this.constructor.name + ", currencyRatio = null" + this.responseError)
             return new ResponseData([this.responseError])
         }
 
         const responseSuccess = `Текущий курс ${currencyRatio.firstCurrency} к ${currencyRatio.secondCurrency}: ${currencyRatio.ratio}.`
         return new ResponseData([responseSuccess])
     }
-
 }

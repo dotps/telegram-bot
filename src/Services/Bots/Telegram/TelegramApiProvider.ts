@@ -14,7 +14,7 @@ export class TelegramApiProvider implements IBotProvider {
     private readonly token: string
     private readonly baseUrl: string
     private readonly webRequestService: IWebRequestService
-    private readonly canUseWebhook
+    private readonly canUseWebhook: boolean
     private readonly model: IModel
     private readonly webhookUrl: string | undefined
     private lastUpdateId: number = 0

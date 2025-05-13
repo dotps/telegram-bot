@@ -89,9 +89,13 @@ export class InputOutputHTTPService implements IInputOutputService {
 
     private getBotUpdates() {
         setInterval(async () => {
-            const queryData = await this.botProvider.getUpdates()
-            if (!queryData.text) return
-            await this.commandHandler.handleQuery(queryData)
+            try {
+                const queryData = await this.botProvider.getUpdates()
+                if (!queryData.text) return
+                await this.commandHandler.handleQuery(queryData)
+            } catch (error) {
+                Logger.error(this.messages.ERROR + JSON.stringify(error))
+            }
         }, this.updateInterval)
     }
 }
