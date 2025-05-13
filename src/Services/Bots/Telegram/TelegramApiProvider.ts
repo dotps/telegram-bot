@@ -7,17 +7,16 @@ import {TelegramBaseResponse} from "../../../Data/Telegram/TelegramBaseResponse"
 import {TelegramGetUpdatesResponse} from "../../../Data/Telegram/TelegramGetUpdatesResponse"
 import {TelegramQueryData} from "../../../Data/Telegram/TelegramQueryData"
 import {IQueryData} from "../../../Data/IQueryData"
-import {TelegramConfig} from "./TelegramConfig"
-import {log} from "node:util"
+import {Config} from "../../../Config/Config"
 
 export class TelegramApiProvider implements IBotProvider {
-
-    private readonly apiUrl: string = "https://api.telegram.org/bot"
-    private readonly token: string = TelegramConfig.token
-    private readonly baseUrl: string = this.apiUrl + this.token + "/"
+    private readonly apiUrl: string
+    private readonly token: string
+    private readonly baseUrl: string
     private readonly webRequestService: IWebRequestService
-    private readonly canUseWebhook = TelegramConfig.canUseWebhook
-    private model: IModel
+    private readonly canUseWebhook
+    private readonly model: IModel
+    private readonly queryMethod: string | undefined
     private lastUpdateId: number = 0
     private readonly messages = {
         ERROR: "Telegram не ok: ",
@@ -27,6 +26,11 @@ export class TelegramApiProvider implements IBotProvider {
     constructor(model: IModel, webRequestService: IWebRequestService) {
         this.model = model
         this.webRequestService = webRequestService
+        this.queryMethod = Config.TELEGRAM_QUERY_METHOD
+        this.token = Config.TELEGRAM_TOKEN || ""
+        this.apiUrl = Config.TELEGRAM_API_URL || ""
+        this.baseUrl = this.apiUrl + this.token + "/"
+        this.canUseWebhook = (Config.TELEGRAM_USE_WEBHOOK)?.toLowerCase() === "true"
     }
 
     public async init(): Promise<void> {
@@ -39,6 +43,10 @@ export class TelegramApiProvider implements IBotProvider {
         else {
             Logger.error(this.messages.ERROR_INIT)
         }
+    }
+
+    getQueryMethod(): string | undefined {
+        return this.queryMethod
     }
 
     async sendResponse(text: string, queryData: IQueryData): Promise<void> {
@@ -77,7 +85,6 @@ export class TelegramApiProvider implements IBotProvider {
 
         let queryData = new TelegramQueryData()
         const updateData = new TelegramGetUpdatesResponse(requestData)
-        console.log(updateData)
 
         if (updateData) {
             const lastUpdate = updateData.getLastUpdate()

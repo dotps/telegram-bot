@@ -8,7 +8,7 @@
 
 ## Настройки бота ##
 Бот по умолчанию работает через webhooks 
-* http://localhost:3000/query
+* http://localhost:3000/telegram
 * метод POST
 
 Также можно переключить на работу с getUpdates для этого в **TelegramConfig** указать `canUseWebhook = false` 

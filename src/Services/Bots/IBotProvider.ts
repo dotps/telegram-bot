@@ -6,5 +6,6 @@ export interface IBotProvider {
     init(): Promise<void>
     handleUpdate(requestData: any): Promise<IQueryData>
     isUseWebhook(): boolean
+    getQueryMethod(): string | undefined
 }
 

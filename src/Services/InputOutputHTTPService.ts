@@ -7,11 +7,12 @@ import {ICurrencyService} from "./Currency/ICurrencyService"
 import {ICommandFactory} from "../Factory/ICommandFactory"
 import {CommandHandler} from "../Commands/CommandHandler"
 import {IQueryData} from "../Data/IQueryData"
+import {Config} from "../Config/Config"
 
 export class InputOutputHTTPService implements IInputOutputService {
 
-    private readonly port: number = 3000
-    private readonly queryMethod: string = "/query"
+    private readonly port: number
+    private readonly queryMethod: string
     private readonly server: Server
     private readonly botProvider: IBotProvider
     private readonly commandHandler: CommandHandler
@@ -27,6 +28,8 @@ export class InputOutputHTTPService implements IInputOutputService {
         this.botProvider = botProvider
         this.server = createServer(this.handlePostRequest.bind(this))
         this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
+        this.port = Number(Config.APP_PORT) ?? 3000
+        this.queryMethod = this.botProvider.getQueryMethod() ?? "/query"
     }
 
     private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
