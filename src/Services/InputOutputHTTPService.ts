@@ -17,6 +17,11 @@ export class InputOutputHTTPService implements IInputOutputService {
     private readonly commandHandler: CommandHandler
     private readonly updateInterval: number = 5000
     private readonly responseHeaders: OutgoingHttpHeaders = {"Content-Type": "application/json"}
+    private readonly messages = {
+        SERVER_START: "Сервер запущен. Порт: ",
+        SERVER_STOP: "Сервер остановлен.",
+        ERROR: "Ошибка: ",
+    } as const
 
     constructor(botProvider: IBotProvider, currencyService: ICurrencyService, commandFactory: ICommandFactory) {
         this.botProvider = botProvider
@@ -25,29 +30,28 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
-
         if (request.method !== "POST" || !request.url?.startsWith(this.queryMethod)) {
             response.writeHead(ResponseCodes.NOT_FOUND, this.responseHeaders)
             response.end()
             return
         }
 
-        try {
-            let body = ""
-            request.on("data", chunk => body += chunk.toString())
-            request.on("end", async () => {
-                response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
-                response.end()
+        let body = ""
+        request.on("data", chunk => body += chunk.toString())
+        request.on("end", async () => {
+            try {
                 const requestData = [JSON.parse(body)]
                 const queryData = await this.botProvider.handleUpdate(requestData)
                 await this.commandHandler.handleQuery(queryData)
-            })
 
-        } catch (error) {
-            response.writeHead(ResponseCodes.ERROR, this.responseHeaders)
-            response.end()
-            Logger.error("Ошибка: " + JSON.stringify(error))
-        }
+                response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
+                response.end()
+            } catch (error) {
+                if (!response.headersSent) response.writeHead(ResponseCodes.ERROR, this.responseHeaders)
+                response.end()
+                Logger.error(this.messages.ERROR + JSON.stringify(error))
+            }
+        })
     }
 
     async start(): Promise<void> {
@@ -55,7 +59,7 @@ export class InputOutputHTTPService implements IInputOutputService {
         await this.botProvider.init()
 
         if (this.botProvider.isUseWebhook()) {
-            this.server.listen(this.port, () => Logger.log("Сервер запущен."))
+            this.server.listen(this.port, () => Logger.log(this.messages.SERVER_START + this.port))
         }
         else {
             this.getBotUpdates()
@@ -63,7 +67,7 @@ export class InputOutputHTTPService implements IInputOutputService {
     }
 
     stop(): void {
-        this.server.close(() => Logger.log("Сервер остановлен."))
+        this.server.close(() => Logger.log(this.messages.SERVER_STOP))
     }
 
     async sendResponse(response: ResponseData | null, queryData: IQueryData): Promise<void> {
@@ -78,7 +82,6 @@ export class InputOutputHTTPService implements IInputOutputService {
     private getBotUpdates() {
         setInterval(async () => {
             const queryData = await this.botProvider.getUpdates()
-            console.log(queryData)
             if (!queryData.text) return
             await this.commandHandler.handleQuery(queryData)
         }, this.updateInterval)
