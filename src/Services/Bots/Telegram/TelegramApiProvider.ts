@@ -8,6 +8,7 @@ import {TelegramGetUpdatesResponse} from "../../../Data/Telegram/TelegramGetUpda
 import {TelegramQueryData} from "../../../Data/Telegram/TelegramQueryData"
 import {IQueryData} from "../../../Data/IQueryData"
 import {TelegramConfig} from "./TelegramConfig"
+import {log} from "node:util"
 
 export class TelegramApiProvider implements IBotProvider {
 
@@ -18,7 +19,10 @@ export class TelegramApiProvider implements IBotProvider {
     private readonly canUseWebhook = TelegramConfig.canUseWebhook
     private model: IModel
     private lastUpdateId: number = 0
-    private errorMessage: string = "Telegram не ok: "
+    private readonly messages = {
+        ERROR: "Telegram не ok: ",
+        ERROR_INIT: "Бот не инициализирован.",
+    } as const
 
     constructor(model: IModel, webRequestService: IWebRequestService) {
         this.model = model
@@ -33,14 +37,14 @@ export class TelegramApiProvider implements IBotProvider {
             return
         }
         else {
-            Logger.error("Не удалось инициализировать бота.")
+            Logger.error(this.messages.ERROR_INIT)
         }
     }
 
     async sendResponse(text: string, queryData: IQueryData): Promise<void> {
 
         if (!this.model.isBotInit()) {
-            Logger.log("Бот не инициализирован.")
+            Logger.log(this.messages.ERROR_INIT)
             return
         }
 
@@ -48,7 +52,7 @@ export class TelegramApiProvider implements IBotProvider {
             const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
             const botResponse = await this.webRequestService.tryGet(url)
             const response = new TelegramBaseResponse(botResponse)
-            if (!response?.ok) Logger.error(this.errorMessage + JSON.stringify(response))
+            if (!response?.ok) Logger.error(this.messages.ERROR + JSON.stringify(response))
         }
     }
 
@@ -63,7 +67,7 @@ export class TelegramApiProvider implements IBotProvider {
             queryData = await this.handleUpdate(response.result)
         }
         else {
-            Logger.error(this.errorMessage + JSON.stringify(response))
+            Logger.error(this.messages.ERROR + JSON.stringify(response))
         }
 
         return queryData
@@ -73,6 +77,7 @@ export class TelegramApiProvider implements IBotProvider {
 
         let queryData = new TelegramQueryData()
         const updateData = new TelegramGetUpdatesResponse(requestData)
+        console.log(updateData)
 
         if (updateData) {
             const lastUpdate = updateData.getLastUpdate()
@@ -90,3 +95,40 @@ export class TelegramApiProvider implements IBotProvider {
     }
 }
 
+/*
+{
+    "ok": true,
+    "result": [
+        {
+            "update_id": 362309960,
+            "message": {
+                "message_id": 197,
+                "from": {
+                    "id": 318745628,
+                    "is_bot": false,
+                    "first_name": "Имя",
+                    "last_name": "Фамилия",
+                    "username": "login",
+                    "language_code": "ru"
+                },
+                "chat": {
+                    "id": 318745628,
+                    "first_name": "Имя",
+                    "last_name": "Фамилия",
+                    "username": "login",
+                    "type": "private"
+                },
+                "date": 1742476287,
+                "text": "/currency",
+                "entities": [
+                    {
+                        "offset": 0,
+                        "length": 6,
+                        "type": "bot_command"
+                    }
+                ]
+            }
+        }
+    ]
+}
+ */

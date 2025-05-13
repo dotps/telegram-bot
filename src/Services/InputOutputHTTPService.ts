@@ -40,9 +40,15 @@ export class InputOutputHTTPService implements IInputOutputService {
         request.on("data", chunk => body += chunk.toString())
         request.on("end", async () => {
             try {
-                const requestData = [JSON.parse(body)]
-                const queryData = await this.botProvider.handleUpdate(requestData)
-                await this.commandHandler.handleQuery(queryData)
+                const requestData = JSON.parse(body)
+
+                if (requestData.ok) {
+                    const queryData = await this.botProvider.handleUpdate(requestData.result)
+                    await this.commandHandler.handleQuery(queryData)
+                }
+                else {
+                    Logger.error(this.messages.ERROR + JSON.stringify(requestData))
+                }
 
                 response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
                 response.end()
