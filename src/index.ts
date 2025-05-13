@@ -21,12 +21,12 @@ Logger.init(new ConsoleLogger(true))
 const model = new Model()
 const webRequestService: IWebRequestService = new WebRequestFetchService()
 const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
-// const currencyProvider: ICurrencyProvider = new Exusd-changeRatesApiCurrencyProvider(webRequestService)
+// const currencyProvider: ICurrencyProvider = new ExchangeRatesApiCurrencyProvider(webRequestService)
 const currencyProvider: ICurrencyProvider = new FreeCurrencyApiCurrencyProvider(webRequestService)
 const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
 const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 
-const isUseHttpServer = false
+const isUseHttpServer = true
 const inputOutputService: IInputOutputService = (isUseHttpServer)
     ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
     : new InputOutputConsoleService(model, currencyService, commandFactory)
