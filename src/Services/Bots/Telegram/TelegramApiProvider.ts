@@ -16,7 +16,7 @@ export class TelegramApiProvider implements IBotProvider {
     private readonly webRequestService: IWebRequestService
     private readonly canUseWebhook
     private readonly model: IModel
-    private readonly queryMethod: string | undefined
+    private readonly webhookUrl: string | undefined
     private lastUpdateId: number = 0
     private readonly messages = {
         ERROR: "Telegram не ok: ",
@@ -26,7 +26,7 @@ export class TelegramApiProvider implements IBotProvider {
     constructor(model: IModel, webRequestService: IWebRequestService) {
         this.model = model
         this.webRequestService = webRequestService
-        this.queryMethod = Config.TELEGRAM_QUERY_METHOD
+        this.webhookUrl = Config.TELEGRAM_WEBHOOK_URL
         this.token = Config.TELEGRAM_TOKEN || ""
         this.apiUrl = Config.TELEGRAM_API_URL || ""
         this.baseUrl = this.apiUrl + this.token + "/"
@@ -45,8 +45,8 @@ export class TelegramApiProvider implements IBotProvider {
         }
     }
 
-    getQueryMethod(): string | undefined {
-        return this.queryMethod
+    getWebhookUrl(): string | undefined {
+        return this.webhookUrl
     }
 
     async sendResponse(text: string, queryData: IQueryData): Promise<void> {

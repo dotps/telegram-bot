@@ -10,9 +10,8 @@ import {IQueryData} from "../Data/IQueryData"
 import {Config} from "../Config/Config"
 
 export class InputOutputHTTPService implements IInputOutputService {
-
-    private readonly port: number
-    private readonly queryMethod: string
+    private readonly port: number = 3000
+    private readonly webhookUrl: string = "/query"
     private readonly server: Server
     private readonly botProvider: IBotProvider
     private readonly commandHandler: CommandHandler
@@ -28,12 +27,12 @@ export class InputOutputHTTPService implements IInputOutputService {
         this.botProvider = botProvider
         this.server = createServer(this.handlePostRequest.bind(this))
         this.commandHandler = new CommandHandler(this, commandFactory, currencyService)
-        this.port = Number(Config.APP_PORT) ?? 3000
-        this.queryMethod = this.botProvider.getQueryMethod() ?? "/query"
+        this.port = Number(Config.APP_PORT) ?? this.port
+        this.webhookUrl = this.botProvider.getWebhookUrl() ?? this.webhookUrl
     }
 
     private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
-        if (request.method !== "POST" || !request.url?.startsWith(this.queryMethod)) {
+        if (request.method !== "POST" || !request.url?.startsWith(this.webhookUrl)) {
             response.writeHead(ResponseCodes.NOT_FOUND, this.responseHeaders)
             response.end()
             return
