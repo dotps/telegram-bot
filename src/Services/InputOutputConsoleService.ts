@@ -47,6 +47,7 @@ export class InputOutputConsoleService implements IInputOutputService {
         if (!response) return
 
         const data = response?.data || []
+        if (data.length !== 0) console.log("==============================================================")
         for (const text of data) {
             console.log(text)
         }
