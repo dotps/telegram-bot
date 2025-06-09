@@ -3,12 +3,12 @@ import {ICommand} from "./command.interface"
 import {ResponseData} from "../data/response.data"
 import {Logger} from "../utils/logger"
 
-export class CurrencyCommand implements ICommand {
+const RESPONSE_ERROR: string = "Ой! Что-то пошло не так."
+const RESPONSE_SUCCESS: string = "Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена."
+const RESPONSE_AVAILABLE: string = "Доступные валюты:"
 
+export class CurrencyCommand implements ICommand {
     private currencyService: ICurrencyService
-    private responseError: string = "Ой! Что-то пошло не так."
-    private responseSuccess: string = "Введи валютную пару в формате USD-EUR, чтобы узнать курс обмена."
-    private responseAvailable: string = "Доступные валюты:"
     private joinSymbolsPattern: string = ", "
     private response: string[] = []
 
@@ -20,13 +20,13 @@ export class CurrencyCommand implements ICommand {
 
         const symbols = await this.currencyService.getCurrencySymbols()
         if (!symbols) {
-            Logger.error(this.constructor.name + ", symbols = null" + this.responseError)
-            return new ResponseData([this.responseError])
+            Logger.error(this.constructor.name + ", symbols = null" + RESPONSE_ERROR)
+            return new ResponseData([RESPONSE_ERROR])
         }
 
-        this.response.push(this.responseAvailable)
+        this.response.push(RESPONSE_AVAILABLE)
         this.response.push(symbols.join(this.joinSymbolsPattern))
-        this.response.push(this.responseSuccess)
+        this.response.push(RESPONSE_SUCCESS)
 
         return new ResponseData(this.response)
     }

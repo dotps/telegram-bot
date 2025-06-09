@@ -6,12 +6,12 @@ import {ResponseData} from "../data/response.data"
 import {Commands} from "./commands"
 import {CommandData} from "../data/command.data"
 
-export class CommandHandler {
+const DEFAULT_RESPONSE: string = "Неизвестная команда."
 
+export class CommandHandler {
     private readonly inputOutputService: IInputOutputService
     private commandFactory: ICommandFactory
     private currencyService: ICurrencyService
-    private defaultResponse: string = "Неизвестная команда."
 
     constructor(inputOutputService: IInputOutputService, commandFactory: ICommandFactory, currencyService: ICurrencyService) {
         this.currencyService = currencyService
@@ -32,7 +32,7 @@ export class CommandHandler {
 
         responseData = (command)
             ? await command.execute(currencies)
-            : new ResponseData([this.defaultResponse])
+            : new ResponseData([DEFAULT_RESPONSE])
 
         await this.inputOutputService.sendResponse(responseData, queryData)
     }
