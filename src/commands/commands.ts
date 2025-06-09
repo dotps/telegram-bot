@@ -1,6 +1,6 @@
 export enum Commands {
-    EXIT = "/exit",
-    CURRENCY = "/currency",
-    START = "/start",
-    CURRENCY_RATIO = "CURRENCY_RATIO",
+    Exit = "/exit",
+    Currency = "/currency",
+    Start = "/start",
+    CurrencyRatio = "CurrencyRatio",
 }

@@ -6,7 +6,7 @@ export class StartCommand implements ICommand {
 
     private response: string[] = [
         `Привет! Я помогу тебе узнать текущие курсы валют.`,
-        `Напиши ${Commands.CURRENCY} для получения списка доступных валют.`
+        `Напиши ${Commands.Currency} для получения списка доступных валют.`
     ]
 
     async execute(): Promise<ResponseData | null> {

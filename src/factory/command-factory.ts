@@ -20,13 +20,13 @@ export class CommandFactory implements ICommandFactory {
 
     createCommand(commandData: CommandData): ICommand | null {
         switch (commandData.input) {
-            case Commands.EXIT:
+            case Commands.Exit:
                 return new ExitCommand(this.model)
-            case Commands.START:
+            case Commands.Start:
                 return new StartCommand()
-            case Commands.CURRENCY:
+            case Commands.Currency:
                 return new CurrencyCommand(this.currencyService)
-            case Commands.CURRENCY_RATIO:
+            case Commands.CurrencyRatio:
                 const currencies = commandData?.params?.currencies || null
                 return new CurrencyRatioCommand(this.currencyService, currencies)
             default:

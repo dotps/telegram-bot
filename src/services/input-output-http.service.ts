@@ -33,7 +33,7 @@ export class InputOutputHTTPService implements IInputOutputService {
 
     private async handlePostRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
         if (request.method !== "POST" || !request.url?.startsWith(this.webhookUrl)) {
-            response.writeHead(ResponseCodes.NOT_FOUND, this.responseHeaders)
+            response.writeHead(ResponseCodes.NotFound, this.responseHeaders)
             response.end()
             return
         }
@@ -52,10 +52,10 @@ export class InputOutputHTTPService implements IInputOutputService {
                     Logger.error(this.messages.ERROR + JSON.stringify(requestData))
                 }
 
-                response.writeHead(ResponseCodes.SUCCESS, this.responseHeaders)
+                response.writeHead(ResponseCodes.Success, this.responseHeaders)
                 response.end()
             } catch (error) {
-                if (!response.headersSent) response.writeHead(ResponseCodes.ERROR, this.responseHeaders)
+                if (!response.headersSent) response.writeHead(ResponseCodes.Error, this.responseHeaders)
                 response.end()
                 Logger.error(this.messages.ERROR + JSON.stringify(error))
             }
@@ -101,7 +101,7 @@ export class InputOutputHTTPService implements IInputOutputService {
 }
 
 export enum ResponseCodes {
-    SUCCESS = 200,
-    NOT_FOUND = 404,
-    ERROR = 500,
+    Success = 200,
+    NotFound = 404,
+    Error = 500,
 }

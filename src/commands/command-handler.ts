@@ -25,7 +25,7 @@ export class CommandHandler {
         let input = queryData.text.toLowerCase().trim()
 
         const currencies = this.currencyService.parseCurrencyCodes(input)
-        if (currencies) input = Commands.CURRENCY_RATIO
+        if (currencies) input = Commands.CurrencyRatio
 
         const commandData = new CommandData(input, {currencies: currencies})
         const command = this.commandFactory.createCommand(commandData)

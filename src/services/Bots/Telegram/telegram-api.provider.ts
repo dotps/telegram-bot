@@ -34,7 +34,7 @@ export class TelegramApiProvider implements IBotProvider {
     }
 
     public async init(): Promise<void> {
-        const response = await this.webRequestService.tryGet(this.baseUrl + TelegramCommands.GET_ME)
+        const response = await this.webRequestService.tryGet(this.baseUrl + TelegramCommands.GetMe)
         const initResponse = new TelegramBaseResponse(response)
         if (initResponse.ok) {
             this.model.botWasInit()
@@ -57,7 +57,7 @@ export class TelegramApiProvider implements IBotProvider {
         }
 
         if (queryData instanceof TelegramQueryData) {
-            const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
+            const url = `${this.baseUrl}${TelegramCommands.SendMessage}?chat_id=${queryData.chatId}&text=${text}`
             const botResponse = await this.webRequestService.tryGet(url)
             const response = new TelegramBaseResponse(botResponse)
             if (!response?.ok) Logger.error(this.messages.ERROR + JSON.stringify(response))
@@ -68,7 +68,7 @@ export class TelegramApiProvider implements IBotProvider {
 
         let queryData = new TelegramQueryData()
         const offset = (this.lastUpdateId) ? `offset=${this.lastUpdateId + 1}&` : ``
-        const botResponse = await this.webRequestService.tryGet(`${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`)
+        const botResponse = await this.webRequestService.tryGet(`${this.baseUrl}${TelegramCommands.GetUpdates}?${offset}`)
         const response = new TelegramBaseResponse(botResponse)
 
         if (response.ok) {
