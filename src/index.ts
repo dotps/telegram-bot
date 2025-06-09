@@ -15,19 +15,23 @@ import {IInputOutputService} from "./services/input-output.interface"
 import {InputOutputHTTPService} from "./services/input-output-http.service"
 import {InputOutputConsoleService} from "./services/input-output-console.service"
 
-Logger.init(new ConsoleLogger(true))
+async function bootstrap() {
+    Logger.init(new ConsoleLogger(true))
 
-const model = new Model()
-const webRequestService: IWebRequestService = new WebRequestFetchService()
-const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
+    const model = new Model()
+    const webRequestService: IWebRequestService = new WebRequestFetchService()
+    const botProvider: IBotProvider = new TelegramApiProvider(model, webRequestService)
 // const currencyProvider: ICurrencyProvider = new ExchangeRatesApiCurrencyProvider(webRequestService)
-const currencyProvider: ICurrencyProvider = new FreeCurrencyApiCurrencyProvider(webRequestService)
-const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
-const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
+    const currencyProvider: ICurrencyProvider = new FreeCurrencyApiCurrencyProvider(webRequestService)
+    const currencyService: ICurrencyService = new CurrencyService(currencyProvider)
+    const commandFactory: ICommandFactory = new CommandFactory(model, currencyService)
 
-const isUseHttpServer = true
-const inputOutputService: IInputOutputService = (isUseHttpServer)
-    ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
-    : new InputOutputConsoleService(model, currencyService, commandFactory)
+    const isUseHttpServer = true
+    const inputOutputService: IInputOutputService = (isUseHttpServer)
+        ? new InputOutputHTTPService(botProvider, currencyService, commandFactory)
+        : new InputOutputConsoleService(model, currencyService, commandFactory)
 
-inputOutputService.start()
+    inputOutputService.start()
+}
+
+bootstrap().catch(error => {})
